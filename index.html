@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/tm.png" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TM E-Commerce</title>
+    <script>
+      // dark mode reload dile 1 s ligt dekay ati of korte
+      (function () {
+        const storedTheme = localStorage.getItem("theme");
+        const defaultTheme = "dark";
+
+        let themeToApply = defaultTheme;
+
+        if (
+          storedTheme === "dark" ||
+          storedTheme === "light" ||
+          storedTheme === "system"
+        ) {
+          themeToApply = storedTheme;
+        } else {
+          localStorage.setItem("theme", defaultTheme);
+        }
+
+        if (themeToApply === "system") {
+          const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
+            .matches
+            ? "dark"
+            : "light";
+          document.documentElement.classList.add(systemTheme);
+        } else {
+          document.documentElement.classList.add(themeToApply);
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

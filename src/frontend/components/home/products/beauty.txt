@@ -1,0 +1,464 @@
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Eye,
+  Heart,
+  ShoppingCart,
+  Star,
+} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { HiArrowLongRight } from "react-icons/hi2";
+import { useNavigate } from "react-router-dom";
+
+const latestProducts = [
+  {
+    id: 1,
+    category: "Fashion",
+    name: "Men Opaque Casual Shirt",
+    brand: "CLAFOUTIS",
+    price: 1450,
+    originalPrice: 1650,
+    discount: 10,
+    rating: 4.2,
+    image:
+      "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+    hoverImage:
+      "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+  },
+  {
+    id: 2,
+    category: "Fashion",
+    name: "Men Comfort Cuban Collar",
+    brand: "Campus Sutra",
+    price: 1850,
+    originalPrice: 2200,
+    discount: 14,
+    rating: 4.5,
+    image:
+      "https://images.unsplash.com/photo-1610030469983-98e550d6193c?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+    hoverImage:
+      "https://images.unsplash.com/photo-1605518216938-7c31b7b14ad0?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+  },
+  {
+    id: 3,
+    category: "Fashion",
+    name: "Men Pure  Casual Shirt",
+    brand: "Allen Solly",
+    price: 1999,
+    originalPrice: 2250,
+    discount: 10,
+    rating: 4.3,
+    image:
+      "https://images.unsplash.com/photo-1621072156002-e2fccdc0b176?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+    hoverImage:
+      "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+  },
+  {
+    id: 4,
+    category: "Fashion",
+    name: "Embroidered Satin Saree",
+    brand: "all about you",
+    price: 4785,
+    originalPrice: 5500,
+    discount: 13,
+    rating: 4.7,
+    image:
+      "https://images.unsplash.com/photo-1546868871-7041f2a55e12?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+    hoverImage:
+      "https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+  },
+  {
+    id: 5,
+    category: "Fashion",
+    name: " Embroidered Saree",
+    brand: "kasee",
+    price: 1922,
+    originalPrice: 1999,
+    discount: 12,
+    rating: 4.4,
+    image:
+      "https://images.unsplash.com/photo-1610030469983-98e550d6193c?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+    hoverImage:
+      "https://images.unsplash.com/photo-1605518216938-7c31b7b14ad0?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+  },
+  {
+    id: 6,
+    category: "Bags",
+    name: "Premium Leather Handbag",
+    brand: "LuxeBag",
+    price: 2500,
+    originalPrice: 3000,
+    discount: 15,
+    rating: 4.6,
+    image:
+      "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+    hoverImage:
+      "https://images.unsplash.com/photo-1584917865442-de89df76afd3?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+  },
+  {
+    id: 7,
+    category: "Electronics",
+    name: "Wireless  Headphones",
+    brand: "TechSound",
+    price: 3499,
+    originalPrice: 4000,
+    discount: 12,
+    rating: 4.5,
+    image:
+      "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+    hoverImage:
+      "https://images.unsplash.com/photo-1484704849700-f032a568e944?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+  },
+  {
+    id: 8,
+    category: "Electronics",
+    name: "Smart Watch Pro",
+    brand: "TechWear",
+    price: 8999,
+    originalPrice: 10000,
+    discount: 10,
+    rating: 4.8,
+    image:
+      "https://images.unsplash.com/photo-1546868871-7041f2a55e12?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+    hoverImage:
+      "https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+  },
+];
+
+const BeautyProducts = () => {
+  const [hoveredProduct, setHoveredProduct] = useState<number | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
+  const velocityRef = useRef(0);
+  const lastXRef = useRef(0);
+  const navigate = useNavigate();
+  const dragStart = useRef({ x: 0, y: 0 });
+
+  const lastTimeRef = useRef(0);
+  const animationFrameIdRef = useRef<number | null>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Add global mouse up listener to handle drag end when mouse is released anywhere
+  useEffect(() => {
+    const handleGlobalMouseUp = () => {
+      setIsDragging(false);
+    };
+
+    if (isDragging) {
+      document.addEventListener("mouseup", handleGlobalMouseUp);
+      return () => document.removeEventListener("mouseup", handleGlobalMouseUp);
+    }
+  }, [isDragging]);
+
+  //mouse drag code
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (e.button !== 0) return;
+    e.preventDefault();
+    setIsDragging(true);
+    setStartX(e.pageX);
+    setScrollLeft(scrollContainerRef.current?.scrollLeft || 0);
+
+    velocityRef.current = 0;
+    lastXRef.current = e.pageX;
+    lastTimeRef.current = e.timeStamp;
+
+    // Disable text selection while dragging
+    document.body.style.userSelect = "none";
+
+    // If inertia animation is running, cancel it
+    if (animationFrameIdRef.current) {
+      cancelAnimationFrame(animationFrameIdRef.current);
+      animationFrameIdRef.current = null;
+    }
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || !scrollContainerRef.current) return;
+    e.preventDefault();
+
+    const currentX = e.pageX;
+    const currentTime = e.timeStamp;
+
+    const deltaX = currentX - lastXRef.current;
+    const deltaTime = currentTime - lastTimeRef.current;
+
+    if (deltaTime > 0) {
+      const newVelocity = deltaX / deltaTime;
+
+      // Smooth velocity with lerp
+      const smoothingFactor = 0.2;
+      velocityRef.current =
+        velocityRef.current * (1 - smoothingFactor) +
+        newVelocity * smoothingFactor;
+
+      // Clamp max velocity
+      const maxVelocity = 1.5;
+      velocityRef.current = Math.max(
+        -maxVelocity,
+        Math.min(maxVelocity, velocityRef.current),
+      );
+    }
+
+    lastXRef.current = currentX;
+    lastTimeRef.current = currentTime;
+
+    const walk = currentX - startX;
+    scrollContainerRef.current.scrollLeft = scrollLeft - walk;
+  };
+
+  const handleMouseUp = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    document.body.style.userSelect = "";
+
+    // Start inertia scroll
+    const decay = 0.95; // friction coefficient (0 < decay < 1)
+    const minVelocity = 0.01; // stop threshold
+    const step = () => {
+      if (!scrollContainerRef.current) return;
+
+      velocityRef.current *= decay;
+
+      if (Math.abs(velocityRef.current) > minVelocity) {
+        scrollContainerRef.current.scrollLeft -= velocityRef.current * 20; // multiply to increase effect
+        animationFrameIdRef.current = requestAnimationFrame(step);
+      } else {
+        animationFrameIdRef.current = null;
+      }
+    };
+
+    animationFrameIdRef.current = requestAnimationFrame(step);
+  };
+
+  const handleMouseLeave = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    document.body.style.userSelect = "";
+
+    if (animationFrameIdRef.current) {
+      cancelAnimationFrame(animationFrameIdRef.current);
+      animationFrameIdRef.current = null;
+    }
+  };
+
+  const scrollToDirection = (direction: "left" | "right") => {
+    if (!scrollContainerRef.current) return;
+
+    const container = scrollContainerRef.current;
+    const firstCard = container.querySelector("div.w-64"); // or better class for card
+
+    if (!firstCard) return;
+
+    const cardStyle = window.getComputedStyle(firstCard);
+    const cardWidth = firstCard.clientWidth;
+    const gap = parseInt(cardStyle.marginRight) || 12; // fallback to 12
+
+    const cardsToScroll = 3;
+    const scrollAmount = (cardWidth + gap) * cardsToScroll;
+
+    const newScrollLeft =
+      container.scrollLeft +
+      (direction === "right" ? scrollAmount : -scrollAmount);
+
+    container.scrollTo({
+      left: newScrollLeft,
+      behavior: "smooth",
+    });
+  };
+
+  return (
+    <div className="bg-[#f6f7f9] py-6 ">
+      <div>
+        <div className="flex justify-between max-w-7xl mx-auto mb-5 xl:mb-8 px-5 lg:px-4">
+          <div>
+            <h2 className="text-xl sm:text-2xl xl:text-3xl font-bold text-gray-900 mb-2">
+              Beauty
+            </h2>
+            <p className="text-sm sm:text-base text-gray-600">
+              Enhance your natural beauty with our exclusive care.
+            </p>
+          </div>
+          <div>
+            <button className="flex items-center gap-1 text-md bg-gray-200 py-1 px-2 rounded-[3px] cursor-pointer hover:bg-gray-300 transition-colors">
+              View All <HiArrowLongRight className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+
+        {/* Products Slider */}
+        <div className="w-full overflow-x-auto relative">
+          {/* Left arrow button aligned exactly at container left edge */}
+          <button
+            onClick={() => scrollToDirection("left")}
+            className="absolute left-7 xl:left-[calc((100%-1200px)/2)] top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg rounded-full p-2 hover:bg-red-600 hover:text-white cursor-pointer transition-colors block"
+          >
+            <ChevronLeft className="w-8 h-8" />
+          </button>
+
+          <div
+            ref={scrollContainerRef}
+            className={cn(
+              "flex gap-[10px] overflow-x-auto scrollbar-hide transition-all duration-200  ",
+            )}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseLeave}
+            style={{
+              scrollbarWidth: "none",
+              msOverflowStyle: "none",
+            }}
+          >
+            {/* Dummy left spacer to match heading alignment */}
+            <div className="hidden lg:block w-[calc((100%-1280px)/2)] flex-shrink-0" />
+            <div className="block lg:hidden w-[10px] flex-shrink-0" />
+
+            {/* product card */}
+            {latestProducts.map((product) => (
+              <div
+                key={product.id}
+                className="w-64 bg-white rounded-sm [box-shadow:rgba(9,30,66,0.25)_0px_1px_1px,rgba(9,30,66,0.13)_0px_0px_1px_1px] hover:[box-shadow:rgba(0,0,0,0.25)_0px_0.0625em_0.0625em,rgba(0,0,0,0.25)_0px_0.125em_0.5em,rgba(255,255,255,0.1)_0px_0px_0px_1px_inset] transition-all duration-300 group flex-shrink-0 mb-1 "
+                onMouseEnter={() => setHoveredProduct(product.id)}
+                onMouseLeave={() => setHoveredProduct(null)}
+              >
+                <div className="relative overflow-hidden rounded-t-sm">
+                  {/* Discount Badge */}
+                  <div className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded z-10">
+                    {product.discount}%
+                  </div>
+
+                  {/* Product Image */}
+                  <div
+                    className="relative h-40 sm:h-48 overflow-hidden cursor-pointer"
+                    onMouseDown={(e) => {
+                      dragStart.current = { x: e.clientX, y: e.clientY };
+                    }}
+                    onClick={(e) => {
+                      const dx = Math.abs(e.clientX - dragStart.current.x);
+                      const dy = Math.abs(e.clientY - dragStart.current.y);
+                      if (dx < 5 && dy < 5) {
+                        navigate(`/products/${product.id}`);
+                      }
+                    }}
+                  >
+                    <img
+                      src={
+                        hoveredProduct === product.id
+                          ? product.hoverImage
+                          : product.image
+                      }
+                      alt={product.name}
+                      className="w-full h-full object-cover transition-all duration-500 group-hover:scale-110"
+                    />
+
+                    {/* Hover Icons */}
+                    <div
+                      className={`absolute inset-0 bg-black/20 flex items-center justify-center gap-2 transition-opacity duration-300 ${
+                        hoveredProduct === product.id
+                          ? "opacity-100"
+                          : "opacity-0"
+                      }`}
+                    >
+                      <button className="rounded-full w-8 h-8 sm:w-10 sm:h-10 p-0 text-black bg-white font-bold hover:bg-red-500 hover:text-white cursor-pointer flex items-center justify-center">
+                        <Eye className="w-3 h-3 sm:w-5 sm:h-5" />
+                      </button>
+
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        className="rounded-full w-8 h-8 sm:w-10 sm:h-10 p-0 text-black bg-white font-bold hover:bg-red-500 hover:text-white cursor-pointer"
+                      >
+                        <Heart className="w-3 h-3 sm:w-4 sm:h-4 " />
+                      </Button>
+
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        className="rounded-full w-8 h-8 sm:w-10 sm:h-10 p-0 text-black bg-white font-bold hover:bg-red-500 hover:text-white cursor-pointer"
+                      >
+                        <ShoppingCart className="w-3 h-3 sm:w-4 sm:h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-3 sm:p-4">
+                  <p className="text-xs text-gray-500 mb-1">{product.brand}</p>
+                  <h3
+                    className="text-gray-900 mb-2 line-clamp-2 text-sm sm:text-base hover:text-red-400 cursor-pointer"
+                    onMouseDown={(e) => {
+                      dragStart.current = { x: e.clientX, y: e.clientY };
+                    }}
+                    onClick={(e) => {
+                      const dx = Math.abs(e.clientX - dragStart.current.x);
+                      const dy = Math.abs(e.clientY - dragStart.current.y);
+                      if (dx < 5 && dy < 5) {
+                        navigate(`/products/${product.id}`);
+                      }
+                    }}
+                  >
+                    {product.name}
+                  </h3>
+
+                  {/* Rating */}
+                  <div className="flex items-center gap-1 mb-2">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        className={`w-4 h-4 ${
+                          i < Math.floor(product.rating)
+                            ? "fill-yellow-500 text-yellow-500"
+                            : "text-gray-300"
+                        }`}
+                      />
+                    ))}
+                    <span className="text-xs text-gray-500 ml-1">
+                      {product.rating}
+                    </span>
+                  </div>
+
+                  {/* Price */}
+                  <div className="flex justify-between items-center gap-2 mb-3 pr-3">
+                    <span className="text-xs sm:text-sm text-gray-400 line-through">
+                      ${product.originalPrice.toLocaleString()}
+                    </span>
+                    <span className="text-base sm:text-lg  text-red-500">
+                      ${product.price.toLocaleString()}
+                    </span>
+                  </div>
+
+                  {/* Add to Cart Button */}
+                  <Button className="w-full cursor-pointer text-red-500 border rounded-sm border-red-400 hover:bg-black hover:border-transparent bg-transparent hover:text-white transition-colors transition-border duration-300 text-xs sm:text-sm">
+                    <ShoppingCart className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+                    ADD TO CART
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <button
+            onClick={() => scrollToDirection("right")}
+            className="absolute right-7 xl:right-24 top-1/2 hover:text-white -translate-y-1/2 z-10 bg-white shadow-lg rounded-full p-2 hover:bg-red-600 cursor-pointer transition-colors block"
+          >
+            <ChevronRight className="w-8 h-8" />
+          </button>
+        </div>
+        {/* Mobile scroll indicators */}
+        {/* <div className="flex justify-center gap-2 mt-4 sm:hidden">
+          <button className="bg-white shadow-md rounded-full p-2 hover:bg-gray-50 transition-colors">
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <button className="bg-white shadow-md rounded-full p-2 hover:bg-gray-50 transition-colors">
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div> */}
+      </div>
+    </div>
+  );
+};
+
+export default BeautyProducts;

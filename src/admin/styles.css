@@ -1,0 +1,131 @@
+.scroll-hidden {
+  scrollbar-width: none; /* Firefox */
+}
+
+.scroll-hidden::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
+
+/* Optional cell border style */
+.with-cell-borders th {
+  font-size: 22px !important;
+  color: rgba(77, 68, 68, 0.747) !important;
+  padding: 1rem 7px !important;
+}
+.dark .with-cell-borders th {
+  color: rgb(255, 255, 255) !important;
+}
+
+.with-cell-borders th:first-child {
+  text-align: left !important;
+}
+
+.dark .with-cell-borders td {
+  border-bottom: 1px solid #dbd1d12f;
+  font-size: medium !important;
+}
+
+.with-cell-borders td {
+  border-bottom: 1px solid #726a6a2a;
+}
+
+.with-cell-borders td:first-child {
+  text-align: left !important;
+}
+
+.with-cell-borders tbody tr:hover {
+  background-color: transparent !important;
+}
+/* tablehoc style */
+.table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.table td {
+  padding: 5px;
+  text-align: center;
+}
+
+.dark .table td {
+  color: rgba(255, 255, 255, 0.76);
+}
+
+.table th {
+  font-weight: 400;
+  font-size: 1.1rem;
+  padding: 1rem 1rem;
+  text-align: center;
+}
+
+.table tbody tr:hover {
+  background-color: rgba(0, 115, 255, 0.075);
+}
+
+.table tbody td img {
+  width: 60px;
+  height: 43px;
+}
+
+.table tbody td a {
+  text-decoration: none;
+  background-color: rgba(44, 104, 255, 0.455);
+  padding: 9px 10px;
+  border-radius: 8px;
+}
+.table tbody td a:hover {
+  background-color: rgba(29, 71, 179, 0.455);
+}
+
+.table tbody td:first-child {
+  border-left: none;
+}
+
+.table tbody td:last-child {
+  border-right: none;
+}
+
+.table-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.table-pagination > button {
+  padding: 0.5rem 1rem;
+  border: none;
+  outline: none;
+  border-radius: 10px;
+  cursor: pointer;
+  background-color: rgba(7, 98, 209, 0.986);
+  color: white;
+}
+
+.table-pagination > button:disabled {
+  background-color: rgba(0, 115, 255, 0.1);
+  cursor: not-allowed;
+}
+
+.red {
+  color: red;
+}
+
+.purple {
+  color: rgb(47, 0, 255);
+}
+
+.green {
+  color: rgb(0, 195, 0);
+}
+
+.paid {
+  color: #cc882f;
+}
+
+.heading {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  text-align: center;
+}
