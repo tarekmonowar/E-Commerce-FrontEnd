@@ -91,8 +91,8 @@ const AddsCard = () => {
     slideChanged: (s) => setCurrentSlide(s.track.details.rel),
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_currentSlide, setCurrentSlide] = useState(0);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  console.log(currentSlide);
 
   useEffect(() => {
     const interval = setInterval(() => {
