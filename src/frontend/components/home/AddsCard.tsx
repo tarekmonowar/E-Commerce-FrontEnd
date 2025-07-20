@@ -92,7 +92,10 @@ const AddsCard = () => {
   });
 
   const [currentSlide, setCurrentSlide] = useState(0);
-  console.log(currentSlide);
+
+  useEffect(() => {
+    console.log("Current Slide:", currentSlide);
+  }, [currentSlide]);
 
   useEffect(() => {
     const interval = setInterval(() => {
