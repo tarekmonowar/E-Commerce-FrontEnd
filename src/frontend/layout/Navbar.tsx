@@ -125,7 +125,10 @@ const Navbar = () => {
               <div className="flex flex-1 max-w-3xl">
                 <div className="relative flex-1">
                   <div className="flex">
-                    <button className="hidden px-4 py-2 bg-[#F3F3F3] border border-r-0 border-gray-300 rounded-l-full text-neutral-dark hover:bg-[#9b949454] md:flex items-center gap-2 cursor-pointer">
+                    <button
+                      className="hidden px-4 py-2 bg-[#F3F3F3] border border-r-0 border-gray-300 rounded-l-full text-neutral-dark hover:bg-[#9b949454] md:flex items-center gap-2 cursor-pointer"
+                      onClick={() => navigate(`/all-products`)}
+                    >
                       All Categories
                     </button>
                     <div className="flex-1 relative">

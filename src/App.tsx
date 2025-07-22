@@ -29,6 +29,7 @@ import MainLayout from "./frontend/layout/MainLayout";
 import BlogDetail from "./frontend/components/home/BlogDetails";
 import FooterLink from "./frontend/layout/FooterLink";
 import ProductDetails from "./frontend/pages/ProductDetails";
+import AllProducts from "./frontend/pages/AllProducts";
 
 export default function App() {
   // Layout wrapper for pages with navbar and footer
@@ -82,6 +83,14 @@ export default function App() {
           element={
             <MainLayout>
               <ProductDetails />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/all-products"
+          element={
+            <MainLayout>
+              <AllProducts />
             </MainLayout>
           }
         />

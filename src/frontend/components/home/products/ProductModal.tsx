@@ -6,7 +6,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import type { ProductType } from "@/frontend/constant/type";
-import { Heart, Minus, Plus, ShoppingCart, Star } from "lucide-react";
+import { Heart, ShoppingCart, Star } from "lucide-react";
 import { useState } from "react";
 
 interface ProductModalProps {
@@ -32,6 +32,15 @@ export default function ProductModal({
     const x = ((e.clientX - rect.left) / rect.width) * 100;
     const y = ((e.clientY - rect.top) / rect.height) * 100;
     setZoomPosition({ x, y });
+  };
+
+  const decrement = () => {
+    setQuantity((prev) => (prev > 1 ? prev - 1 : prev));
+  };
+  const increment = () => {
+    // if (data?.product?.stock === quantity)
+    //   return toast.error(`${data?.product?.stock} available only`);
+    setQuantity((prev) => prev + 1);
   };
 
   const handleImageClick = (index: number) => {
@@ -175,21 +184,22 @@ export default function ProductModal({
             </div>
 
             {/* Quantity Selector */}
-            <div className="flex items-center gap-4 mb-6">
+            {/* Quantity Selector */}
+            <div className="flex items-center gap-4 mb-4">
               <label className="text-md font-medium">Quantity:</label>
-              <div className="flex items-center border rounded-sm overflow-hidden">
+              <div>
                 <button
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="px-3 py-2 font-bold text-xl hover:bg-gray-400 transition-colors cursor-pointer border-r"
+                  onClick={decrement}
+                  className="px-5 bg-gray-300 py-[3px] rounded-[3px] font-semibold text-xl cursor-pointer hover:bg-gray-900 hover:text-white"
                 >
-                  <Minus size={18} />
+                  -
                 </button>
-                <span className="px-4 font-bold text-xl ">{quantity}</span>
+                <span className="px-4 text-xl font-semibold">{quantity}</span>
                 <button
-                  onClick={() => setQuantity(quantity + 1)}
-                  className="px-3 py-2 font-bold text-xl hover:bg-gray-400 transition-colors cursor-pointer border-l"
+                  onClick={increment}
+                  className="px-5 bg-gray-300 py-[3px] rounded-[3px] font-semibold text-xl cursor-pointer hover:bg-gray-900 hover:text-white"
                 >
-                  <Plus size={18} />
+                  +
                 </button>
               </div>
             </div>

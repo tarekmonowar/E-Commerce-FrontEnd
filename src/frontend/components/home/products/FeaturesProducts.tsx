@@ -94,7 +94,7 @@ const FeaturedProducts = () => {
                       {/* Product Image */}
                       <div
                         className="relative h-40 sm:h-48 overflow-hidden cursor-pointer"
-                        onClick={() => navigate(`/products/${product._id}`)}
+                        onClick={() => navigate(`/product/${product._id}`)}
                       >
                         <img
                           src={

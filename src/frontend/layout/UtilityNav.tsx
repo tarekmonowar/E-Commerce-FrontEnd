@@ -83,7 +83,9 @@ const UtilityNav = () => {
                       key={index}
                       className="relative px-4 py-[7px] text-gray-700 hover:bg-gray-100 group"
                     >
-                      <Link to="">
+                      <Link
+                        to={`/all-products?category=${category.name.toLowerCase()}`}
+                      >
                         <div className="flex items-center gap-3">
                           <category.icon
                             size={22}
@@ -104,7 +106,7 @@ const UtilityNav = () => {
           {/* Center Menu Items */}
           <div className="flex items-center gap-8">
             <Link
-              to={"/hhh"}
+              to={"/all-products"}
               className="py-3 text-neutral-dark hover:text-[#236027] hover:scale-105 transition-colors"
             >
               All Products

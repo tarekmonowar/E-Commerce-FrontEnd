@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { Products as latestProducts } from "@/frontend/constant/products";
-import type { ProductType } from "@/frontend/constant/type";
 import {
   ChevronLeft,
   ChevronRight,
@@ -10,7 +9,6 @@ import {
   Star,
 } from "lucide-react";
 import { useState } from "react";
-import { HiArrowLongRight } from "react-icons/hi2";
 import { useNavigate } from "react-router-dom";
 // @ts-expect-error TS2307: Cannot find module
 import "swiper/css";
@@ -18,14 +16,14 @@ import "swiper/css";
 import "swiper/css/free-mode";
 import { FreeMode } from "swiper/modules";
 import { Swiper, SwiperSlide, type SwiperClass } from "swiper/react";
-import ProductModal from "./ProductModal";
+import ProductModal from "../home/products/ProductModal";
+import type { ProductType } from "@/frontend/constant/type";
 
-const GroceriesProducts = () => {
+const RelatedProducts = () => {
   const [hoveredProduct, setHoveredProduct] = useState<string | null>(null);
   const [swiperInstance, setSwiperInstance] = useState<SwiperClass | null>(
     null,
   );
-
   const [selectedProduct, setSelectedProduct] = useState<ProductType | null>(
     null,
   );
@@ -35,6 +33,7 @@ const GroceriesProducts = () => {
     setSelectedProduct(product);
     setModalOpen(true);
   };
+
   const navigate = useNavigate();
 
   return (
@@ -44,16 +43,8 @@ const GroceriesProducts = () => {
           <div className="flex justify-between max-w-7xl mx-auto mb-5 xl:mb-8 px-5 lg:px-4">
             <div>
               <h2 className="text-xl sm:text-2xl xl:text-3xl font-bold text-gray-900 mb-2">
-                Groceries
+                Related Products
               </h2>
-              <p className="text-sm sm:text-base text-gray-600">
-                Fresh essentials and quality picks to brighten your kitchen.
-              </p>
-            </div>
-            <div>
-              <button className="flex items-center gap-1 text-md bg-gray-200 py-1 px-2 rounded-[3px] cursor-pointer hover:bg-gray-300 transition-colors">
-                View All <HiArrowLongRight className="w-5 h-5" />
-              </button>
             </div>
           </div>
 
@@ -71,7 +62,7 @@ const GroceriesProducts = () => {
               freeMode={true}
               modules={[FreeMode]}
               spaceBetween={10}
-              slidesPerGroup={3}
+              slidesPerGroup={4}
               slidesPerView={"auto"}
               className="[scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden mySwiper"
             >
@@ -97,7 +88,7 @@ const GroceriesProducts = () => {
                       {/* Product Image */}
                       <div
                         className="relative h-40 sm:h-48 overflow-hidden cursor-pointer"
-                        onClick={() => navigate(`/product/${product._id}`)}
+                        onClick={() => navigate(`/products/${product._id}`)}
                       >
                         <img
                           src={
@@ -219,4 +210,4 @@ const GroceriesProducts = () => {
   );
 };
 
-export default GroceriesProducts;
+export default RelatedProducts;
