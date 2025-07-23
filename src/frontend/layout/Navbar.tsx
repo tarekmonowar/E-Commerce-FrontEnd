@@ -14,6 +14,7 @@ import MobileSidebar from "./MobileSlidebar";
 import AccountModal from "./modal/AccountModal";
 import ContactModal from "./modal/ContactModal";
 import CartModal from "./modal/CartModal";
+import UtilityNav from "./UtilityNav";
 // import { useCart } from "../../context/CartContext";
 
 const Navbar = () => {
@@ -67,38 +68,38 @@ const Navbar = () => {
 
   return (
     <>
-      <header className="font-poppins w-full fixed top-0 z-50">
-        {/* Scrolling Banner */}
-        <div className="bg-[#2C742F] text-white py-2 w-full overflow-hidden relative">
-          <div className="relative flex-1">
-            <div className="flex animate-marquee whitespace-nowrap text-sm font-medium text-[#F4C439]">
-              <span className="mx-6">
-                🎉 Summer Sale: Up to 70% off selected items
-              </span>
-              <span className="mx-6">
-                🎉 Summer Sale: Up to 70% off selected items
-              </span>
-              <span className="mx-6">
-                🎉 Summer Sale: Up to 70% off selected items
-              </span>
-              <span className="mx-6">
-                🎉 Summer Sale: Up to 70% off selected items
-              </span>
-              {/* duplicated again for infinite scroll */}
-              <span className="mx-6">
-                🎉 Summer Sale: Up to 70% off selected items
-              </span>
-              <span className="mx-6">
-                🎉 Summer Sale: Up to 70% off selected items
-              </span>
-              <span className="mx-6">
-                🎉 Summer Sale: Up to 70% off selected items
-              </span>
-            </div>
+      {/* Scrolling Banner */}
+      <div className="bg-[#2C742F] text-white py-2 w-full overflow-hidden relative">
+        <div className="relative flex-1">
+          <div className="flex animate-marquee whitespace-nowrap text-sm font-medium text-[#F4C439]">
+            <span className="mx-6">
+              🎉 Summer Sale: Up to 70% off selected items
+            </span>
+            <span className="mx-6">
+              🎉 Summer Sale: Up to 70% off selected items
+            </span>
+            <span className="mx-6">
+              🎉 Summer Sale: Up to 70% off selected items
+            </span>
+            <span className="mx-6">
+              🎉 Summer Sale: Up to 70% off selected items
+            </span>
+            {/* duplicated again for infinite scroll */}
+            <span className="mx-6">
+              🎉 Summer Sale: Up to 70% off selected items
+            </span>
+            <span className="mx-6">
+              🎉 Summer Sale: Up to 70% off selected items
+            </span>
+            <span className="mx-6">
+              🎉 Summer Sale: Up to 70% off selected items
+            </span>
           </div>
         </div>
+      </div>
 
-        {/* Main Navbar */}
+      {/* Main Navbar */}
+      <header className="font-poppins w-full sticky top-0 z-50">
         <div className="py-2 w-full bg-[#F3F9F1] border-b shadow-sm border-gray-200">
           <div className="max-w-7xl mx-auto px-4">
             <div className="flex items-center justify-between gap-4 md:gap-8">
@@ -116,7 +117,7 @@ const Navbar = () => {
                   <img
                     src="/logo.png"
                     alt="TM E-commerce"
-                    className="w-15 h-15 rounded-full "
+                    className="w-13 h-13 rounded-full "
                   />
                 </Link>
               </div>
@@ -213,7 +214,11 @@ const Navbar = () => {
 
                     {/* Account Dropdown Menu */}
                     {isUserMenuOpen && (
-                      <AccountModal user={user} handleLogout={handleLogout} />
+                      <AccountModal
+                        user={user}
+                        handleLogout={handleLogout}
+                        setIsUserMenuOpen={() => setIsUserMenuOpen(false)}
+                      />
                     )}
                   </div>
                 ) : (
@@ -232,6 +237,7 @@ const Navbar = () => {
             </div>
           </div>
         </div>
+        <UtilityNav />
 
         <MobileSidebar
           isOpen={isMobileMenuOpen}

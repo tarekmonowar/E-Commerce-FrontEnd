@@ -11,11 +11,13 @@ type User = {
 type AccountModalProps = {
   user: User;
   handleLogout: () => void;
+  setIsUserMenuOpen: () => void;
 };
 
 export default function AccountModal({
   user,
   handleLogout,
+  setIsUserMenuOpen,
 }: AccountModalProps) {
   return (
     <div className="absolute top-full right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-100 py-2 z-50">
@@ -30,15 +32,18 @@ export default function AccountModal({
         {user.role === "admin" && (
           <Link
             to="/admin"
+            target="_blank"
             className="flex items-center gap-2 px-4 py-1 mx-2 rounded-md text-sm md:text-[16px]  text-white bg-[#2C742F] hover:bg-[#236027] "
+            onClick={setIsUserMenuOpen}
           >
             <FiHome /> Admin Dashboard
           </Link>
         )}
 
         <Link
-          to="/orders"
+          to="/my-orders"
           className="flex items-center gap-2 px-4 py-2 mt-2  text-sm mx-2 text-gray-700 hover:bg-gray-100 "
+          onClick={setIsUserMenuOpen}
         >
           <FiPackage className="text-gray-400 text-lg" />
           My Orders
@@ -46,6 +51,7 @@ export default function AccountModal({
         <Link
           to="/order-tracking"
           className="flex items-center gap-2 px-4 py-2   text-sm mx-2 text-gray-700 hover:bg-gray-100 "
+          onClick={setIsUserMenuOpen}
         >
           <MdOutlineLocalShipping className="text-lg text-gray-400" />
           Order Tracking
@@ -53,6 +59,7 @@ export default function AccountModal({
         <Link
           to="/wishlist"
           className="flex items-center gap-2 px-4 py-2 text-sm mx-2 text-gray-700 hover:bg-gray-100 "
+          onClick={setIsUserMenuOpen}
         >
           <FiHeart className="text-gray-400 text-lg" />
           Wishlist
@@ -60,6 +67,7 @@ export default function AccountModal({
         <Link
           to="/account"
           className="flex items-center gap-2 px-4 py-2 mx-2 text-sm text-gray-700 hover:bg-gray-100 "
+          onClick={setIsUserMenuOpen}
         >
           <FiUser className="text-gray-400 text-lg" />
           My Account

@@ -38,7 +38,7 @@ const RelatedProducts = () => {
 
   return (
     <>
-      <div className="bg-[#f6f7f9] py-6 ">
+      <div className="bg-[#f6f7f9] py-6 pb-10 ">
         <div>
           <div className="flex justify-between max-w-7xl mx-auto mb-5 xl:mb-8 px-5 lg:px-4">
             <div>
@@ -88,7 +88,7 @@ const RelatedProducts = () => {
                       {/* Product Image */}
                       <div
                         className="relative h-40 sm:h-48 overflow-hidden cursor-pointer"
-                        onClick={() => navigate(`/products/${product._id}`)}
+                        onClick={() => navigate(`/product/${product._id}`)}
                       >
                         <img
                           src={

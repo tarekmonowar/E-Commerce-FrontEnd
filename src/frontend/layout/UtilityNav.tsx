@@ -56,7 +56,7 @@ const UtilityNav = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
   return (
-    <div className=" bg-gray-50  relative pt-[113.5px] hidden md:block">
+    <div className=" bg-gray-50 border-b border-gray-200 relative hidden md:block">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between">
           {/* Browse Categories Button */}
@@ -85,6 +85,7 @@ const UtilityNav = () => {
                     >
                       <Link
                         to={`/all-products?category=${category.name.toLowerCase()}`}
+                        onClick={() => setIsDropdownOpen(false)}
                       >
                         <div className="flex items-center gap-3">
                           <category.icon
@@ -106,26 +107,48 @@ const UtilityNav = () => {
           {/* Center Menu Items */}
           <div className="flex items-center gap-8">
             <Link
-              to={"/all-products"}
-              className="py-3 text-neutral-dark hover:text-[#236027] hover:scale-105 transition-colors"
+              to="/all-products"
+              className="relative inline-block py-3 text-neutral-dark transition-colors duration-300 
+             after:content-[''] after:absolute after:bottom-2 after:left-0 after:w-full after:h-[2px]
+             after:bg-[#236027] after:origin-center after:scale-x-0
+             after:transition-transform after:duration-300 hover:after:scale-x-100 ease-in-out"
             >
               All Products
             </Link>
+
             <Link
-              to={"/hhh"}
-              className="py-3 text-neutral-dark hover:text-[#236027] hover:scale-105 transition-colors"
+              to={"/accounts"}
+              className="relative inline-block py-3 text-neutral-dark transition-colors duration-300 
+             after:content-[''] after:absolute after:bottom-2 after:left-0 after:w-full after:h-[2px]
+             after:bg-[#236027] after:origin-center after:scale-x-0
+             after:transition-transform after:duration-300 hover:after:scale-x-100 ease-in-out"
             >
-              Order tracking
+              My Accounts
+            </Link>
+            <Link
+              to={"/order-tracking"}
+              className="relative inline-block py-3 text-neutral-dark transition-colors duration-300 
+             after:content-[''] after:absolute after:bottom-2 after:left-0 after:w-full after:h-[2px]
+             after:bg-[#236027] after:origin-center after:scale-x-0
+             after:transition-transform after:duration-300 hover:after:scale-x-100 ease-in-out"
+            >
+              Order Tracking
             </Link>
             <Link
               to="/footerLink/contact"
-              className="py-3 text-neutral-dark hover:text-[#236027] hover:scale-105 transition-colors"
+              className="relative inline-block py-3 text-neutral-dark transition-colors duration-300 
+             after:content-[''] after:absolute after:bottom-2 after:left-0 after:w-full after:h-[2px]
+             after:bg-[#236027] after:origin-center after:scale-x-0
+             after:transition-transform after:duration-300 hover:after:scale-x-100 ease-in-out"
             >
               Contact
             </Link>
             <Link
-              to={"/hhh"}
-              className="py-3 text-neutral-dark hover:text-[#236027] hover:scale-105 transition-colors"
+              to="/footerLink/faqs"
+              className="relative inline-block py-3 text-neutral-dark transition-colors duration-300 
+             after:content-[''] after:absolute after:bottom-2 after:left-0 after:w-full after:h-[2px]
+             after:bg-[#236027] after:origin-center after:scale-x-0
+             after:transition-transform after:duration-300  hover:after:scale-x-100 ease-in-out"
             >
               FAQ
             </Link>

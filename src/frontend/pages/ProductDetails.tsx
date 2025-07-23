@@ -112,9 +112,9 @@ export default function ProductPage() {
             <h1 className="text-2xl font-semibold">{product.name}</h1>
 
             <div className="flex flex-wrap gap-4 items-center">
-              <p className="text-muted-foreground">
+              <p className="text-gray-700">
                 Brand:{" "}
-                <span className="text-primary font-medium">
+                <span className="text-gray-950 font-medium">
                   {product.brand}
                 </span>
               </p>
@@ -182,13 +182,10 @@ export default function ProductPage() {
 
             {/* Actions */}
             <div className="flex flex-wrap gap-4 mt-5 xl:mt-7">
-              <Button className="rounded-sm text-white/80 hover:bg-white hover:text-black cursor-pointer border ">
+              <Button className="rounded-sm text-white/80 bg-black hover:bg-white hover:text-black cursor-pointer border ">
                 <ShoppingCart /> ADD TO CART
               </Button>
-              <Button
-                variant="outline"
-                className="rounded-sm hover:bg-gray-300 hidden sm:flex cursor-pointer "
-              >
+              <Button className="rounded-sm border hover:bg-gray-300 hover:text-black hidden sm:flex cursor-pointer ">
                 <Heart className="w-4 h-4 " /> Add to Wishlist
               </Button>
             </div>

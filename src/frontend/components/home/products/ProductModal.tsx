@@ -115,15 +115,15 @@ export default function ProductModal({
           {/* Product Details Section */}
           <div className="p-6 py-8 space-y-3 ">
             {/* Product Title and Brand */}
-            <h1 className="text-2xl font-semibold text-foreground mb-2 xl:mb-3">
+            <h1 className="text-2xl font-semibold text-black mb-2 xl:mb-3">
               {product.name}
             </h1>
 
             <div className="flex flex-col sm:flex-row justify-left items-center gap-5 ">
               <div>
-                <p className="text-muted-foreground">
+                <p className="text-gray-700">
                   Brand:{" "}
-                  <span className="text-primary font-medium">
+                  <span className="text-gray-950 font-medium">
                     {product.brand}
                   </span>
                 </p>
@@ -209,14 +209,11 @@ export default function ProductModal({
               <div className="flex">
                 <Button
                   variant="default"
-                  className="mr-4 rounded-sm text-white/80 hover:bg-white hover:text-black hover:border cursor-pointer "
+                  className="mr-4 rounded-sm text-white/80 hover:bg-white bg-black hover:text-black border cursor-pointer "
                 >
                   <ShoppingCart /> ADD TO CART
                 </Button>
-                <Button
-                  variant="outline"
-                  className="font-bold rounded-sm hover:bg-gray-300 cursor-pointer hidden sm:flex"
-                >
+                <Button className="font-bold border text-black rounded-sm hover:bg-gray-300 cursor-pointer hidden sm:flex">
                   <Heart className="w-4 h-4" />
                   Add to Wishlist
                 </Button>

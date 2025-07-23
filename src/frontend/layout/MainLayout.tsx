@@ -1,7 +1,6 @@
-import TopFooter from "./TopFooter";
 import Footer from "./Footer";
 import Navbar from "./Navbar";
-import UtilityNav from "./UtilityNav";
+import TopFooter from "./TopFooter";
 
 //TS  types setup
 type MainLayoutProps = {
@@ -12,7 +11,6 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   return (
     <main className="min-h-screen flex flex-col font-custom bg-white">
       <Navbar />
-      <UtilityNav />
       <section className="flex-grow">{children}</section>
       <TopFooter />
       <Footer />

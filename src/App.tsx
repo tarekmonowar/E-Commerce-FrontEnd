@@ -30,6 +30,8 @@ import BlogDetail from "./frontend/components/home/BlogDetails";
 import FooterLink from "./frontend/layout/FooterLink";
 import ProductDetails from "./frontend/pages/ProductDetails";
 import AllProducts from "./frontend/pages/AllProducts";
+import OrderTracking from "./frontend/pages/OrderTracking";
+import MyOrders from "./frontend/pages/MyOrders";
 
 export default function App() {
   // Layout wrapper for pages with navbar and footer
@@ -94,7 +96,24 @@ export default function App() {
             </MainLayout>
           }
         />
+        <Route
+          path="/order-tracking"
+          element={
+            <MainLayout>
+              <OrderTracking />
+            </MainLayout>
+          }
+        />
         {/* Frontend login routes */}
+
+        <Route
+          path="/my-orders"
+          element={
+            <MainLayout>
+              <MyOrders />
+            </MainLayout>
+          }
+        />
 
         {/* Admin protected routes */}
         <Route
