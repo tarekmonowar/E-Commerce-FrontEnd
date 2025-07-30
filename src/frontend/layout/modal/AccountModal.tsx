@@ -1,12 +1,7 @@
 import { FiHeart, FiHome, FiLogOut, FiPackage, FiUser } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import { MdOutlineLocalShipping } from "react-icons/md";
-
-type User = {
-  displayName?: string | null;
-  email?: string | null;
-  role?: string;
-};
+import type { User } from "@/frontend/types/types";
 
 type AccountModalProps = {
   user: User;
@@ -23,17 +18,17 @@ export default function AccountModal({
     <div className="absolute top-full right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-100 py-2 z-50">
       <div className="px-4 py-2 border-b border-gray-300">
         <p className="text-md font-medium text-gray-900">
-          {user.displayName || "User"}
+          {user.name || "User"}
         </p>
         <p className="text-xs text-gray-500">{user.email}</p>
       </div>
 
       <div className="py-1 mt-2">
-        {user.role === "admin" && (
+        {(user.role === "ADMIN" || user.role === "SUPER_ADMIN") && (
           <Link
             to="/admin"
             target="_blank"
-            className="flex items-center gap-2 px-4 py-1 mx-2 rounded-md text-sm md:text-[16px]  text-white bg-[#2C742F] hover:bg-[#236027] "
+            className="flex items-center gap-2 px-4 py-1 mx-2 rounded-md text-sm md:text-[16px] text-white bg-[#2C742F] hover:bg-[#236027]"
             onClick={setIsUserMenuOpen}
           >
             <FiHome /> Admin Dashboard

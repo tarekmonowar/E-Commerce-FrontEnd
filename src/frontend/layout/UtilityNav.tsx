@@ -4,6 +4,7 @@ import { BiCategory } from "react-icons/bi";
 import { BsHeadset } from "react-icons/bs";
 import { FaRegPlusSquare } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const categories = [
   {
@@ -117,6 +118,10 @@ const UtilityNav = () => {
             </Link>
 
             <Link
+              onClick={(e) => {
+                e.preventDefault();
+                toast.info("Fucking ");
+              }}
               to={"/accounts"}
               className="relative inline-block py-3 text-neutral-dark transition-colors duration-300 
              after:content-[''] after:absolute after:bottom-2 after:left-0 after:w-full after:h-[2px]

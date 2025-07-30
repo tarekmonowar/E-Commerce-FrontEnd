@@ -1,10 +1,22 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useLoginMutation } from "@/redux/api/authApi";
+import { useRegisterMutation } from "@/redux/api/userApi";
+import { setUser } from "@/redux/reducer/userReducer";
 import { useState } from "react";
 import { FaGithub, FaGoogle } from "react-icons/fa";
 import { FaFacebook } from "react-icons/fa6";
+import { useDispatch } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const AuthForm = () => {
+  const Dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const [isLoading, setIsLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [touched, setTouched] = useState(false);
   const [signupData, setSignupData] = useState({
     name: "",
     email: "",
@@ -16,26 +28,103 @@ const AuthForm = () => {
     setIsSignUp(!isSignUp);
   };
 
-  //signUp handler
-  const handleSignUpSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const [register] = useRegisterMutation();
+  const [login] = useLoginMutation();
+
+  //register/signUp handler
+  const handleSignUpSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const { name, email, password } = signupData;
     if (!name || !email || !password) {
       console.warn("Please fill all signup fields");
       return;
     }
-    console.log("Sign Up Data:", signupData);
+
+    try {
+      setIsLoading(true);
+      const res = await register({ name, email, password });
+      if (res.data?.success) {
+        toast.success("Register Successful, Please Login");
+        setIsSignUp(false);
+        setIsLoading(false);
+      } else {
+        setIsLoading(false);
+        const message =
+          (res.error as any).data.message ||
+          (res.error as any).data.errorSource?.[0].message ||
+          (res.error as any).message ||
+          res.data?.message ||
+          "Registration failed.";
+        toast.error(message);
+      }
+    } catch (error: any) {
+      setIsLoading(false);
+      const message =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Something went wrong. Please try again.";
+      toast.error(message);
+    }
   };
 
-  //signIn handler
-  const handleSignInSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  //Login/signIn handler
+  const handleSignInSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const { email, password } = signinData;
     if (!email || !password) {
       console.warn("Please fill all signin fields");
       return;
     }
-    console.log("Sign In Data:", signinData);
+
+    try {
+      setIsLoading(true);
+      const res = await login({ email, password });
+
+      if (res.data?.success) {
+        toast.success(res.data.message);
+        Dispatch(setUser(res.data.data));
+        navigate("/");
+        setIsLoading(false);
+      } else {
+        setIsLoading(false);
+        const message =
+          (res.error as any)?.data?.message ||
+          (res.error as any)?.message ||
+          "Something went wrong";
+        toast.error(message);
+      }
+    } catch (error) {
+      setIsLoading(false);
+      console.error("Sign in failed:", error);
+      toast.error("Something went wrong. Please try again.");
+    }
+  };
+
+  //Password validation
+  const validatePassword = (password: string) => {
+    const minLength = /.{8,}/;
+    const uppercase = /[A-Z]/;
+    const lowercase = /[a-z]/;
+    const specialChar = /[!@#$%^&*(),.?":{}|<>]/;
+
+    return {
+      minLength: minLength.test(password),
+      uppercase: uppercase.test(password),
+      lowercase: lowercase.test(password),
+      specialChar: specialChar.test(password),
+      isValid:
+        minLength.test(password) &&
+        uppercase.test(password) &&
+        lowercase.test(password) &&
+        specialChar.test(password),
+    };
+  };
+
+  const passwordValidation = validatePassword(signupData.password);
+
+  //Google
+  const handleGoogleLogin = () => {
+    window.location.href = `${import.meta.env.VITE_SERVER}/api/v1/auth/google`;
   };
 
   return (
@@ -60,7 +149,11 @@ const AuthForm = () => {
             <div>
               <h1 className="font-bold text-2xl mb-6">Create Account</h1>
               <div className="flex space-x-3 mb-6 justify-center">
-                <button className="border border-gray-300 rounded-full bg-[#EA4335] text-white w-10 h-10 xl:w-12 xl:h-12 flex items-center justify-center hover:bg-[#ea3535ab] transition-colors cursor-pointer hover:scale-105">
+                <button
+                  type="button"
+                  onClick={handleGoogleLogin}
+                  className="border border-gray-300 rounded-full bg-[#EA4335] text-white w-10 h-10 xl:w-12 xl:h-12 flex items-center justify-center hover:bg-[#ea3535ab] transition-colors cursor-pointer hover:scale-105"
+                >
                   <FaGoogle size={24} />
                 </button>
                 <button className="border border-gray-300 bg-gray-300 rounded-full w-10 h-10 xl:w-12 xl:h-12 cursor-pointer flex items-center justify-center hover:bg-gray-200 transition-colors hover:scale-105">
@@ -75,8 +168,9 @@ const AuthForm = () => {
                 or use Email
               </span>
               <input
-                type="name"
+                type="text"
                 placeholder="name"
+                autoComplete="name"
                 value={signupData.name}
                 required
                 onChange={(e) =>
@@ -87,6 +181,7 @@ const AuthForm = () => {
               <input
                 type="email"
                 placeholder="Email"
+                autoComplete="email"
                 value={signupData.email}
                 required
                 onChange={(e) =>
@@ -98,6 +193,7 @@ const AuthForm = () => {
                 <input
                   type={showPassword ? "text" : "password"}
                   value={signupData.password}
+                  onBlur={() => setTouched(true)}
                   onChange={(e) =>
                     setSignupData({ ...signupData, password: e.target.value })
                   }
@@ -118,7 +214,33 @@ const AuthForm = () => {
               type="submit"
               className="rounded-md border border-[#2B7A0B] bg-[#2B7A0B] text-white text-xs xl:text-base font-bold py-3 px-11 mt-2 tracking-wider uppercase transition-transform duration-75 hover:scale-95 focus:outline-none cursor-pointer"
             >
-              Sign Up
+              {" "}
+              {isLoading ? (
+                <div className="flex items-center justify-center gap-2">
+                  <svg
+                    className="animate-spin h-4 w-4 text-white"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      fill="none"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                    ></path>
+                  </svg>
+                  Signing up...
+                </div>
+              ) : (
+                "Sign Up"
+              )}
             </button>
           </form>
         </div>
@@ -138,7 +260,11 @@ const AuthForm = () => {
             <div>
               <h1 className="font-bold text-2xl mb-6">Sign In</h1>
               <div className="flex space-x-3 mb-6 justify-center">
-                <button className="border border-gray-300 rounded-full bg-[#EA4335] text-white w-10 h-10 xl:w-12 xl:h-12 flex items-center justify-center hover:bg-[#ea3535ab] transition-colors cursor-pointer hover:scale-105">
+                <button
+                  type="button"
+                  onClick={handleGoogleLogin}
+                  className="border border-gray-300 rounded-full bg-[#EA4335] text-white w-10 h-10 xl:w-12 xl:h-12 flex items-center justify-center hover:bg-[#ea3535ab] transition-colors cursor-pointer hover:scale-105"
+                >
                   <FaGoogle size={24} />
                 </button>
                 <button className="border border-gray-300 bg-gray-300 rounded-full w-10 h-10 xl:w-12 xl:h-12 cursor-pointer flex items-center justify-center hover:bg-gray-200 transition-colors hover:scale-105">
@@ -155,6 +281,7 @@ const AuthForm = () => {
               <input
                 type="email"
                 value={signinData.email}
+                autoComplete="email"
                 onChange={(e) =>
                   setSigninData({ ...signinData, email: e.target.value })
                 }
@@ -181,18 +308,44 @@ const AuthForm = () => {
                   {showPassword ? "Hide" : "Show"}
                 </button>
               </div>
-              <a
-                href="#"
+              <Link
+                to={"/reset-password"}
                 className="text-gray-700 text-sm my-4 hover:text-[#2B7A0B] transition-colors block hover:underline"
               >
                 Forgot your password?
-              </a>
+              </Link>
             </div>
             <button
               type="submit"
+              disabled={isLoading}
               className="rounded-md border border-[#2B7A0B] bg-[#2B7A0B] text-white text-xs xl:text-base font-bold py-3 px-11 tracking-wider uppercase transition-transform duration-75 hover:scale-95 focus:outline-none cursor-pointer"
             >
-              Sign In
+              {isLoading ? (
+                <div className="flex items-center justify-center gap-2">
+                  <svg
+                    className="animate-spin h-4 w-4 text-white"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      fill="none"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                    ></path>
+                  </svg>
+                  Signing in...
+                </div>
+              ) : (
+                "Sign In"
+              )}
             </button>
           </form>
         </div>
@@ -214,18 +367,31 @@ const AuthForm = () => {
                 isSignUp ? "translate-x-0" : "-translate-x-1/5"
               }`}
             >
-              <h1 className="font-bold text-2xl mb-4">
-                Thanks for choosing us!
-              </h1>
-              <p className="text-sm font-light leading-5 tracking-wide mb-8">
-                Join us today and start your shopping journey
-              </p>
-              <button
-                onClick={toggleMode}
-                className="rounded-full border border-white bg-transparent text-black text-xs md:text-base font-bold py-2 px-9 tracking-wider uppercase transition-transform duration-75 hover:scale-95 focus:outline-none cursor-pointer"
-              >
-                Sign In
-              </button>
+              <div className="flex flex-col items-center justify-center">
+                <h1 className="font-bold text-2xl mb-4">
+                  Thanks for choosing us!
+                </h1>
+                <p className="text-sm font-light leading-5 tracking-wide mb-8">
+                  Join us today and start your shopping journey
+                </p>
+                <button
+                  onClick={toggleMode}
+                  className="rounded-full border border-white bg-transparent text-black text-xs md:text-base font-bold py-2 px-9 tracking-wider uppercase transition-transform duration-75 hover:scale-95 focus:outline-none cursor-pointer"
+                >
+                  Sign In
+                </button>
+              </div>
+
+              {touched && !passwordValidation.isValid && (
+                <div className="absolute bottom-6 text-sm space-y-1 p-2 w-full text-left pl-10 text-black">
+                  {!passwordValidation.minLength && <span>8 char &</span>}
+                  {!passwordValidation.uppercase && <span> 1 uppercase &</span>}
+                  {!passwordValidation.lowercase && <span> 1 lowercase &</span>}
+                  {!passwordValidation.specialChar && (
+                    <span> 1 special char</span>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Right Overlay Panel */}
@@ -235,8 +401,8 @@ const AuthForm = () => {
               }`}
             >
               <h1 className="font-bold text-2xl mb-4">Wellcome Back !</h1>
-              <p className="text-sm font-light leading-5 tracking-wide mb-8 text-[#f3b90c]">
-                Sign in for a faster checkout experience
+              <p className="text-sm font-light leading-5 tracking-wide mb-8 text-white/80">
+                Don't have an account? Register here
               </p>
               <button
                 onClick={toggleMode}

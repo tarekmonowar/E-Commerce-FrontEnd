@@ -15,6 +15,11 @@ import AccountModal from "./modal/AccountModal";
 import ContactModal from "./modal/ContactModal";
 import CartModal from "./modal/CartModal";
 import UtilityNav from "./UtilityNav";
+import { useDispatch, useSelector } from "react-redux";
+import type { RootState } from "@/redux/store";
+import { useLogoutMutation } from "@/redux/api/authApi";
+import { toast } from "react-toastify";
+import { clearUser } from "@/redux/reducer/userReducer";
 // import { useCart } from "../../context/CartContext";
 
 const Navbar = () => {
@@ -24,17 +29,12 @@ const Navbar = () => {
   const [isQuickContactOpen, setIsQuickContactOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement | null>(null);
   const quickContactRef = useRef<HTMLDivElement | null>(null);
-  // const { getCartCount } = useCart();
-  // const { user, logOut } = useAuth();
 
-  const user = {
-    displayName: "jidjd",
-    photoURL: "sfsfsf",
-    email: "tarek@gmail.com",
-    role: "admin",
-  };
+  const user = useSelector((state: RootState) => state.userReducer.user);
+  const [logOut] = useLogoutMutation();
 
   const navigate = useNavigate();
+  const Dispatch = useDispatch();
 
   // Close menus when clicking outside
   useEffect(() => {
@@ -59,8 +59,12 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      // await logOut();
+      await logOut();
+      localStorage.removeItem("user");
       setIsUserMenuOpen(false);
+      toast.success("Logout Successful");
+      Dispatch(clearUser());
+      navigate("/sign-in");
     } catch (error) {
       console.error("Logout error:", error);
     }
@@ -192,19 +196,18 @@ const Navbar = () => {
                       onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                       className="w-full flex flex-col items-center cursor-pointer hover:scale-105"
                     >
-                      <div className="w-6 xl:w-8 h-6 xl:h-8 rounded-full bg-[#2C742F] text-white flex items-center justify-center mb-1">
-                        {user.photoURL ? (
+                      <div className="w-6 xl:w-7 h-6 xl:h-7 rounded-full bg-[#2C742F] text-white flex items-center justify-center mb-1">
+                        {user.picture ? (
                           <img
-                            src={user.photoURL}
-                            alt={user.displayName}
+                            src={user.picture}
                             className="w-full h-full rounded-full object-cover"
                           />
                         ) : (
-                          <span className="text-xs xl:text-xl font-bold">
-                            {user.displayName
-                              ? user.displayName[0].toUpperCase()
-                              : "U"}
-                          </span>
+                          <img
+                            src="/default-avatar.png"
+                            alt="Default Avatar"
+                            className="w-full h-full object-cover rounded-full"
+                          />
                         )}
                       </div>
                       <span className="text-[10px] xl:text-[13px]">
@@ -227,10 +230,10 @@ const Navbar = () => {
                     className="hidden md:flex w-12 flex-col items-center cursor-pointer hover:scale-105"
                   >
                     <FiUser
-                      size={24}
-                      className="text-[#666666] group-hover:text-[#2C742F] transition-colors mb-1"
+                      size={28}
+                      className="text-[#666666] group-hover:text-[#2C742F] transition-colors mb-[3px]"
                     />
-                    <span className="text-[10px]">Account</span>
+                    <span className="text-[10px] xl:text-[13px]">Sign In</span>
                   </button>
                 )}
               </div>

@@ -1,12 +1,15 @@
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { ThemeProvider } from "./contexts/theme-provider";
 
 // Import Toastify
-import { Bounce, ToastContainer } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 //Public routes import
 import Home from "./frontend/pages/Home";
+import { getUser } from "./redux/api/userApi";
 
 //Authenticate routes import
 
@@ -25,23 +28,40 @@ import Stock from "./admin/pages/Stock";
 import TopCustomers from "./admin/pages/TopCustomers";
 import VerifiedAdmin from "./admin/pages/VerifiedAdmin";
 import SignIn from "./frontend/components/account/SignIn";
-import MainLayout from "./frontend/layout/MainLayout";
 import BlogDetail from "./frontend/components/home/BlogDetails";
 import FooterLink from "./frontend/layout/FooterLink";
-import ProductDetails from "./frontend/pages/ProductDetails";
+import MainLayout from "./frontend/layout/MainLayout";
 import AllProducts from "./frontend/pages/AllProducts";
-import OrderTracking from "./frontend/pages/OrderTracking";
 import MyOrders from "./frontend/pages/MyOrders";
+import OrderTracking from "./frontend/pages/OrderTracking";
+import ProductDetails from "./frontend/pages/ProductDetails";
+import Wishlisht from "./frontend/pages/Wishlisht";
+import { clearUser, setUser } from "./redux/reducer/userReducer";
+import ResetPassword from "./frontend/components/account/ResetPassword";
+import ProtectedRoute from "./lib/ProtectedRoute";
+import type { RootState } from "./redux/store";
 
 export default function App() {
-  // Layout wrapper for pages with navbar and footer
-  // const MainLayout = ({ children }: MainLayoutProps) => (
-  //   <main className="bg-white font-custom">
-  //     <Navbar />
-  //     {children}
-  //     <Footer />
-  //   </main>
-  // );
+  const Dispatch = useDispatch();
+  const user = useSelector((state: RootState) => state.userReducer.user);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const user = await getUser();
+        if (user) {
+          Dispatch(setUser(user));
+        } else {
+          Dispatch(clearUser());
+        }
+      } catch (err) {
+        console.log(err);
+        Dispatch(clearUser());
+      }
+    };
+
+    fetchUser();
+  }, [Dispatch]);
 
   return (
     <BrowserRouter>
@@ -53,14 +73,6 @@ export default function App() {
           element={
             <MainLayout>
               <Home />
-            </MainLayout>
-          }
-        />
-        <Route
-          path="/sign-in"
-          element={
-            <MainLayout>
-              <SignIn />
             </MainLayout>
           }
         />
@@ -104,24 +116,66 @@ export default function App() {
             </MainLayout>
           }
         />
+
+        <Route
+          path="/sign-in"
+          element={
+            <ProtectedRoute isAuthenticated={user ? false : true}>
+              <MainLayout>
+                <SignIn />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/reset-password"
+          element={
+            <ProtectedRoute isAuthenticated={user ? false : true}>
+              <MainLayout>
+                <ResetPassword />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+
         {/* Frontend login routes */}
 
         <Route
-          path="/my-orders"
-          element={
-            <MainLayout>
-              <MyOrders />
-            </MainLayout>
-          }
-        />
+          element={<ProtectedRoute isAuthenticated={user ? true : false} />}
+        >
+          <Route
+            path="/my-orders"
+            element={
+              <MainLayout>
+                <MyOrders />
+              </MainLayout>
+            }
+          />
+          <Route
+            path="/wishlist"
+            element={
+              <MainLayout>
+                <Wishlisht />
+              </MainLayout>
+            }
+          />
+        </Route>
 
         {/* Admin protected routes */}
         <Route
           path="/admin"
           element={
-            <ThemeProvider storageKey="theme">
-              <Layout />
-            </ThemeProvider>
+            <ProtectedRoute
+              isAuthenticated={user ? true : false}
+              adminOnly={true}
+              isAdmin={user?.role === "ADMIN" || user?.role === "SUPER_ADMIN"}
+              redirectPath="/"
+            >
+              <ThemeProvider storageKey="theme">
+                <Layout />
+              </ThemeProvider>
+            </ProtectedRoute>
           }
         >
           <Route index element={<Dashboard />} />
@@ -144,14 +198,15 @@ export default function App() {
       <ToastContainer
         position="top-center"
         autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        pauseOnHover
-        draggable
-        theme="dark"
-        transition={Bounce}
-        style={{ top: "60px" }}
+        stacked
+        hideProgressBar
+        toastClassName={() =>
+          "flex items-center  gap-3 bg-gray-200 shadow-lg px-5 py-2 rounded-[3px] text-black text-lg text-center font-semibold  min-h-[70px] max-w-[25vw] w-fit"
+        }
+        style={{
+          width: "25vw",
+          top: "30px",
+        }}
       />
     </BrowserRouter>
   );
