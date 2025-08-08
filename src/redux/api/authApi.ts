@@ -45,6 +45,17 @@ export const authApi = createApi({
         },
       }),
     }),
+
+    changePassword: builder.mutation<
+      ApiResponse<null>,
+      { oldPassword: string; newPassword: string }
+    >({
+      query: ({ oldPassword, newPassword }) => ({
+        url: "/change-password",
+        method: "POST",
+        body: { oldPassword, newPassword },
+      }),
+    }),
   }),
 });
 
@@ -53,4 +64,5 @@ export const {
   useLogoutMutation,
   useForgotPasswordMutation,
   useResetPasswordMutation,
+  useChangePasswordMutation,
 } = authApi;

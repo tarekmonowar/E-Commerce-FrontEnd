@@ -23,3 +23,19 @@ export type LoginPayload = {
   email: string;
   password: string;
 };
+
+export type ShippingAddress = {
+  name?: string;
+  phone?: string | undefined;
+  address?: string;
+  city?: string;
+};
+
+export type updateUserPayload = {
+  name?: string;
+  phone?: string | undefined;
+  picture?: string;
+  isActive?: "ACTIVE" | "BLOCKED";
+  shippingAddress?: ShippingAddress;
+  role?: "ADMIN" | "USER";
+};

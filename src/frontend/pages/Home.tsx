@@ -4,9 +4,10 @@ import CategorySection from "../components/home/CategorySection";
 import FourImagescard from "../components/home/FourImagescard";
 import HeroBanner from "../components/home/heroBanner";
 import BeautyProducts from "../components/home/products/BeautyProducts";
+import FashionProducts from "../components/home/products/FashionProducts";
 import FeaturesProducts from "../components/home/products/FeaturesProducts";
-import FootWearProducts from "../components/home/products/FootwearProducts";
 import GroceriesProducts from "../components/home/products/GroceriesProducts";
+import JewelleryProducts from "../components/home/products/JewelleryProducts";
 import LatestProducts from "../components/home/products/LatestProducts";
 import PopularProducts from "../components/home/products/Popularproducts";
 
@@ -23,8 +24,9 @@ export default function Home() {
       <FeaturesProducts />
       <AddsCard />
       <GroceriesProducts />
+      <FashionProducts />
       <BeautyProducts />
-      <FootWearProducts />
+      <JewelleryProducts />
       <Blogs />
     </section>
   );

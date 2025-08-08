@@ -199,7 +199,7 @@ const Navbar = () => {
                       <div className="w-6 xl:w-7 h-6 xl:h-7 rounded-full bg-[#2C742F] text-white flex items-center justify-center mb-1">
                         {user.picture ? (
                           <img
-                            src={user.picture}
+                            src={user.picture.url}
                             className="w-full h-full rounded-full object-cover"
                           />
                         ) : (

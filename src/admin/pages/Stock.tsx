@@ -7,60 +7,46 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
-
-interface Product {
-  id: string;
-  name: string;
-  category: string;
-  price: number;
-  totalSales: number;
-  stock: number;
-}
-
-const initialData = {
-  available: [
-    {
-      id: "1",
-      name: "Bluetooth Speaker",
-      category: "Audio",
-      price: 90,
-      totalSales: 850,
-      stock: 10,
-    },
-    {
-      id: "2",
-      name: "Sneakers",
-      category: "Footwear",
-      price: 120,
-      totalSales: 560,
-      stock: 12,
-    },
-  ],
-  unavailable: [
-    {
-      id: "3",
-      name: "Macbook Pro",
-      category: "Electronics",
-      price: 2500,
-      totalSales: 400,
-      stock: 0,
-    },
-    {
-      id: "4",
-      name: "Gaming Mouse",
-      category: "Accessories",
-      price: 60,
-      totalSales: 600,
-      stock: 0,
-    },
-  ],
-};
+import { useGetAllProductsQuery } from "@/redux/api/productApi"; // Adjust path as needed
+import type { CustomError, Product } from "@/frontend/types/types";
+import { useEffect } from "react";
+import { toast } from "react-toastify";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Link } from "react-router-dom";
 
 const Stock = () => {
-  const [availableProducts] = useState<Product[]>(initialData.available);
-  const [unavailableProducts] = useState<Product[]>(initialData.unavailable);
+  const { data, isLoading, isError, error } = useGetAllProductsQuery({
+    sort: "-updatedAt",
+  });
+
+  const availableProducts =
+    data?.data?.filter((p: Product) => p.stock > 0) || [];
+  const unavailableProducts =
+    data?.data?.filter((p: Product) => p.stock <= 0) || [];
+
+  useEffect(() => {
+    if (isError) {
+      const err = error as CustomError;
+      toast.error(err?.data?.message || "Something went wrong");
+    }
+  }, [isError, error]);
+
+  const TableSkeletonRows = ({ rows = 4, columns = 5 }) => {
+    return (
+      <>
+        {Array.from({ length: rows }).map((_, rowIndex) => (
+          <TableRow key={rowIndex}>
+            {Array.from({ length: columns }).map((_, colIndex) => (
+              <TableCell key={colIndex}>
+                <Skeleton className="h-7 w-full rounded-sm" />
+              </TableCell>
+            ))}
+          </TableRow>
+        ))}
+      </>
+    );
+  };
 
   return (
     <div className="flex flex-col lg:flex-row gap-6 xl:mt-10">
@@ -77,7 +63,7 @@ const Stock = () => {
                 Price
               </TableHead>
               <TableHead className="dark:text-white text-center">
-                Sales
+                Discount
               </TableHead>
               <TableHead className="dark:text-white text-center">
                 Status
@@ -88,32 +74,56 @@ const Stock = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {unavailableProducts.map((p) => (
-              <TableRow
-                key={p.id}
-                className="dark:border-gray-800 border-gray-300 dark:hover:bg-gray-800"
-              >
-                <TableCell className="dark:text-gray-300">{p.name}</TableCell>
-                <TableCell className="text-center dark:text-gray-300 font-medium">
-                  ${p.price}
-                </TableCell>
-                <TableCell className="text-center dark:text-gray-300 font-medium">
-                  {p.totalSales}
-                </TableCell>
-                <TableCell className="text-center">
-                  <Badge variant="destructive">Unavailable</Badge>
-                </TableCell>
-                <TableCell className="text-center">
-                  <Button
-                    variant="link"
-                    className="bg-blue-600 hover:bg-blue-700 cursor-pointer text-white rounded-md shadow-lg transform transition-transform duration-200 hover:scale-105"
-                    onClick={() => console.log(`Go to /products/${p.id}`)}
-                  >
-                    View
-                  </Button>
+            {/* Error show */}
+            {isError && (
+              <TableRow>
+                <TableCell colSpan={8} className="text-red-500 text-center">
+                  Error:{" "}
+                  {
+                    // Check if error is FetchBaseQueryError with data/message
+                    "status" in error &&
+                    error.data &&
+                    typeof error.data === "object" &&
+                    "message" in error.data
+                      ? (error.data as { message: string }).message
+                      : "Something went wrong"
+                  }
                 </TableCell>
               </TableRow>
-            ))}
+            )}
+            {/* loading skelton */}
+
+            {isLoading ? (
+              <TableSkeletonRows rows={20} columns={5} />
+            ) : (
+              unavailableProducts.map((p: Product) => (
+                <TableRow
+                  key={p._id}
+                  className="dark:border-gray-800 border-gray-300 dark:hover:bg-gray-800"
+                >
+                  <TableCell className="dark:text-gray-300">{p.name}</TableCell>
+                  <TableCell className="text-center dark:text-gray-300 font-medium">
+                    ${p.price}
+                  </TableCell>
+                  <TableCell className="text-center dark:text-gray-300 font-medium">
+                    {p.discount}%
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <Badge variant="destructive">Unavailable</Badge>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <Link to={`/admin/product/${p._id}`}>
+                      <Button
+                        variant="link"
+                        className="bg-blue-600 hover:bg-blue-700 cursor-pointer text-white rounded-md shadow-lg transform transition-transform duration-200 hover:scale-105"
+                      >
+                        View
+                      </Button>
+                    </Link>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>
@@ -127,12 +137,11 @@ const Stock = () => {
           <TableHeader>
             <TableRow className="dark:border-gray-800 border-gray-300 text-[15px] font-semibold">
               <TableHead className="dark:text-white">Name</TableHead>
-
               <TableHead className="dark:text-white text-center">
                 Price
               </TableHead>
               <TableHead className="dark:text-white text-center">
-                Sales
+                Discount
               </TableHead>
               <TableHead className="dark:text-white text-center">
                 Status
@@ -143,33 +152,55 @@ const Stock = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {availableProducts.map((p) => (
-              <TableRow
-                key={p.id}
-                className="dark:border-gray-800 border-gray-300 dark:hover:bg-gray-800"
-              >
-                <TableCell className="dark:text-gray-300">{p.name}</TableCell>
-
-                <TableCell className="text-center dark:text-gray-300 font-medium">
-                  ${p.price}
-                </TableCell>
-                <TableCell className="text-center dark:text-gray-300 font-medium">
-                  {p.totalSales}
-                </TableCell>
-                <TableCell className="text-center">
-                  <Badge variant="default">Available</Badge>
-                </TableCell>
-                <TableCell className="text-center">
-                  <Button
-                    variant="link"
-                    className="bg-blue-600 hover:bg-blue-700 cursor-pointer text-white rounded-md shadow-lg transform transition-transform duration-200 hover:scale-105"
-                    onClick={() => console.log(`Go to /products/${p.id}`)}
-                  >
-                    View
-                  </Button>
+            {/* Error show */}
+            {isError && (
+              <TableRow>
+                <TableCell colSpan={8} className="text-red-500 text-center">
+                  Error:{" "}
+                  {
+                    // Check if error is FetchBaseQueryError with data/message
+                    "status" in error &&
+                    error.data &&
+                    typeof error.data === "object" &&
+                    "message" in error.data
+                      ? (error.data as { message: string }).message
+                      : "Something went wrong"
+                  }
                 </TableCell>
               </TableRow>
-            ))}
+            )}
+            {/* loading skelton */}
+            {isLoading ? (
+              <TableSkeletonRows rows={20} columns={5} />
+            ) : (
+              availableProducts.map((p: Product) => (
+                <TableRow
+                  key={p._id}
+                  className="dark:border-gray-800 border-gray-300 dark:hover:bg-gray-800"
+                >
+                  <TableCell className="dark:text-gray-300">{p.name}</TableCell>
+                  <TableCell className="text-center dark:text-gray-300 font-medium">
+                    ${p.price}
+                  </TableCell>
+                  <TableCell className="text-center dark:text-gray-300 font-medium">
+                    {p.discount}%
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <Badge variant="default">Available</Badge>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <Link to={`/admin/product/${p._id}`}>
+                      <Button
+                        variant="link"
+                        className="bg-blue-600 hover:bg-blue-700 cursor-pointer text-white rounded-md shadow-lg transform transition-transform duration-200 hover:scale-105"
+                      >
+                        View
+                      </Button>
+                    </Link>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>

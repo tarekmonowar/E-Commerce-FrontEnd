@@ -2,17 +2,17 @@
 import { useLoginMutation } from "@/redux/api/authApi";
 import { useRegisterMutation } from "@/redux/api/userApi";
 import { setUser } from "@/redux/reducer/userReducer";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaGithub, FaGoogle } from "react-icons/fa";
 import { FaFacebook } from "react-icons/fa6";
 import { useDispatch } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const AuthForm = () => {
   const Dispatch = useDispatch();
   const navigate = useNavigate();
-
+  const [searchParams] = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -27,6 +27,13 @@ const AuthForm = () => {
   const toggleMode = () => {
     setIsSignUp(!isSignUp);
   };
+
+  useEffect(() => {
+    const error = searchParams.get("error");
+    if (error) {
+      toast.error(decodeURIComponent(error));
+    }
+  }, [searchParams]);
 
   const [register] = useRegisterMutation();
   const [login] = useLoginMutation();

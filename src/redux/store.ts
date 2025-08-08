@@ -4,6 +4,8 @@ import { setupListeners } from "@reduxjs/toolkit/query";
 import { userReducer } from "./reducer/userReducer";
 import { authApi } from "./api/authApi";
 import { userApi } from "./api/userApi";
+import { otpApi } from "./api/otpApi";
+import { productApi } from "./api/productApi";
 
 export const server = import.meta.env.VITE_SERVER;
 
@@ -24,12 +26,16 @@ const store = configureStore({
   reducer: {
     [authApi.reducerPath]: authApi.reducer,
     [userApi.reducerPath]: userApi.reducer,
+    [otpApi.reducerPath]: otpApi.reducer,
+    [productApi.reducerPath]: productApi.reducer,
     [userReducer.name]: userReducer.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat([
       authApi.middleware,
       userApi.middleware,
+      otpApi.middleware,
+      productApi.middleware,
       userLocalStorageMiddleware,
     ]),
 });

@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -6,7 +5,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import type { Product } from "@/frontend/types/types";
-import { Heart, ShoppingCart, Star } from "lucide-react";
+import { Star } from "lucide-react";
 import { useState } from "react";
 
 interface ProductModalProps {
@@ -15,7 +14,7 @@ interface ProductModalProps {
   onClose: (open: boolean) => void;
 }
 
-export default function ProductModal({
+export default function ProductModalAdmin({
   product,
   open,
   onClose,
@@ -23,7 +22,6 @@ export default function ProductModal({
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isZooming, setIsZooming] = useState(false);
   const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
-  const [quantity, setQuantity] = useState(1);
 
   if (!product) return null;
 
@@ -34,29 +32,20 @@ export default function ProductModal({
     setZoomPosition({ x, y });
   };
 
-  const decrement = () => {
-    setQuantity((prev) => (prev > 1 ? prev - 1 : prev));
-  };
-  const increment = () => {
-    // if (data?.product?.stock === quantity)
-    //   return toast.error(`${data?.product?.stock} available only`);
-    setQuantity((prev) => prev + 1);
-  };
-
   const handleImageClick = (index: number) => {
     setSelectedImageIndex(index);
   };
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="!max-w-5xl  !p-0 !gap-0 bg-gray-100 !border-none">
+      <DialogContent className="!max-w-5xl  !p-0 !gap-0 bg-gray-100 dark:bg-gray-900 !border-none">
         <DialogHeader className="sr-only">
           <DialogTitle>{product.name}</DialogTitle>
         </DialogHeader>
 
         <div className="grid grid-cols-2 gap-0">
           {/* Image Gallery Section */}
-          <div className="flex gap-4 p-6 pt-7 bg-[#F3F9F1] rounded-md">
+          <div className="flex gap-4 p-6 pt-7 bg-[#F3F9F1] dark:bg-gray-900 rounded-md">
             {/* Thumbnail Images */}
             <div className="flex flex-col gap-2 w-16">
               {product.photos.map((photo, index) => (
@@ -81,7 +70,7 @@ export default function ProductModal({
             {/* Main Image with Zoom */}
             <div className="flex-1 relative">
               <div
-                className="relative w-full aspect-square bg-[#F3F9F1] rounded-md overflow-hidden cursor-zoom-in"
+                className="relative w-full aspect-square bg-[#F3F9F1] dark:bg-gray-900 rounded-md overflow-hidden cursor-zoom-in"
                 onMouseEnter={() => setIsZooming(true)}
                 onMouseLeave={() => setIsZooming(false)}
                 onMouseMove={handleMouseMove}
@@ -115,22 +104,28 @@ export default function ProductModal({
           {/* Product Details Section */}
           <div className="p-6 py-8 space-y-3 ">
             {/* Product Title and Brand */}
-            <h1 className="text-2xl font-semibold text-black mb-2 xl:mb-3">
-              {product.name}
+            <h1 className="text-2xl font-semibold text-black  dark:text-white mb-2 xl:mb-3">
+              Name : {product.name}
             </h1>
 
-            <div className="flex flex-col sm:flex-row justify-left items-center gap-5 ">
+            <div className=" ">
               <div>
-                <p className="text-gray-700">
+                <p className="text-gray-700  dark:text-white/70">
                   Brand:{" "}
-                  <span className="text-gray-950 font-medium">
+                  <span className="text-gray-950  dark:text-white font-medium">
                     {product.brand}
+                  </span>
+                </p>
+                <p className="text-gray-700  dark:text-white/70 mt-3">
+                  Category :{" "}
+                  <span className="text-gray-950  dark:text-white font-medium ">
+                    {product.category}
                   </span>
                 </p>
               </div>
 
               {/* Rating */}
-              <div className="flex  items-center gap-2">
+              <div className="flex  items-center gap-2 mt-4">
                 <div className="flex">
                   {[...Array(5)].map((_, i) => (
                     <Star
@@ -143,7 +138,7 @@ export default function ProductModal({
                     />
                   ))}
                 </div>
-                <span className="text-sm text-gray-950">
+                <span className="text-sm text-gray-950  dark:text-white">
                   Review ({product.numOfReviews})
                 </span>
               </div>
@@ -151,19 +146,22 @@ export default function ProductModal({
 
             {/* Price */}
 
-            <div className="flex flex-col sm:flex-row items-center gap-4 xl:gap-5">
+            <div className="">
               <div>
-                <span className="text-md line-through text-muted-foreground mr-3">
+                <span className="text-md line-through text-muted-foreground mr-5">
                   ${product.price}
                 </span>
                 <span className="text-xl font-semibold text-red-500">
                   ${product.discountPrice}
                 </span>
               </div>
+              <div className="dark:text-white mt-5">
+                Discount : {product.discount}%
+              </div>
               <div>
-                <p>
-                  Available In Stock:
-                  <span className=" font-bold text-green-800">
+                <p className="text-black  dark:text-white/80 mt-4">
+                  Available In Stock :
+                  <span className=" font-bold text-green-800 dark:text-green-600">
                     {" "}
                     {product.stock} Items
                   </span>
@@ -173,51 +171,9 @@ export default function ProductModal({
 
             {/* Description */}
             <div className="my-5 hidden md:block">
-              <p className="text-sm text-gray-800 leading-relaxed">
-                {product.description}
+              <p className="text-sm text-gray-800  dark:text-white/70 leading-relaxed">
+                Description : {product.description}
               </p>
-            </div>
-
-            {/* Free Shipping */}
-            <div className="text-md text-blue-700">
-              Free Shipping (Est. Delivery Time 2-3 Days)
-            </div>
-
-            {/* Quantity Selector */}
-            {/* Quantity Selector */}
-            <div className="flex items-center gap-4 mb-4">
-              <label className="text-md font-medium">Quantity:</label>
-              <div>
-                <button
-                  onClick={decrement}
-                  className="px-5 bg-gray-300 py-[3px] rounded-[3px] font-semibold text-xl cursor-pointer hover:bg-gray-900 hover:text-white"
-                >
-                  -
-                </button>
-                <span className="px-4 text-xl font-semibold">{quantity}</span>
-                <button
-                  onClick={increment}
-                  className="px-5 bg-gray-300 py-[3px] rounded-[3px] font-semibold text-xl cursor-pointer hover:bg-gray-900 hover:text-white"
-                >
-                  +
-                </button>
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div>
-              <div className="flex">
-                <Button
-                  variant="default"
-                  className="mr-4 rounded-sm text-white/80 hover:bg-white bg-black hover:text-black border cursor-pointer "
-                >
-                  <ShoppingCart /> ADD TO CART
-                </Button>
-                <Button className="font-bold border text-black rounded-sm hover:bg-gray-300 cursor-pointer hidden sm:flex">
-                  <Heart className="w-4 h-4" />
-                  Add to Wishlist
-                </Button>
-              </div>
             </div>
           </div>
         </div>

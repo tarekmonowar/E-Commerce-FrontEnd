@@ -22,7 +22,7 @@ import type { CustomError, Product } from "@/frontend/types/types";
 import { toast } from "react-toastify";
 import ProductsSkelton from "../../utils/ProductsSkelton";
 
-const LatestProducts = () => {
+const FashionProducts = () => {
   const [hoveredProduct, setHoveredProduct] = useState<string | null>(null);
   const [swiperInstance, setSwiperInstance] = useState<SwiperClass | null>(
     null,
@@ -31,10 +31,11 @@ const LatestProducts = () => {
   const [modalOpen, setModalOpen] = useState(false);
 
   const { data, isLoading, isError, error } = useGetAllProductsQuery({
-    sort: "-createdAt",
+    category: "fashion",
+    sort: "createdAt",
   });
 
-  const latestProducts = data?.data as Product[];
+  const products = data?.data as Product[];
 
   useEffect(() => {
     if (isError) {
@@ -49,12 +50,6 @@ const LatestProducts = () => {
   };
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (swiperInstance) {
-      swiperInstance.update();
-    }
-  }, [latestProducts, swiperInstance]);
-
   return (
     <>
       <div className="bg-[#f6f7f9] py-6 ">
@@ -62,18 +57,15 @@ const LatestProducts = () => {
           <div className="flex justify-between max-w-7xl mx-auto mb-5 xl:mb-8 px-5 lg:px-4">
             <div>
               <h2 className="text-xl sm:text-2xl xl:text-3xl font-bold text-gray-900 mb-2">
-                Latest Products
+                Fashions
               </h2>
               <p className="text-sm sm:text-base text-gray-600">
-                Discover the newest arrivals — updated just this{" "}
-                <span className="text-[#2C742F] font-bold">
-                  {new Date().toLocaleString("en-US", { month: "long" })}!
-                </span>
+                Fresh essentials and quality picks to brighten your kitchen.
               </p>
             </div>
             <div>
               <Link
-                to={`/all-products`}
+                to={`/all-products?category=fashion`}
                 className="flex items-center gap-1 text-md bg-gray-200 py-1 px-2 rounded-[3px] cursor-pointer hover:bg-gray-300 transition-colors"
               >
                 View All <HiArrowLongRight className="w-5 h-5" />
@@ -82,10 +74,7 @@ const LatestProducts = () => {
           </div>
 
           {/* Products Slider */}
-          <div
-            className="w-full overflow-x-auto relative"
-            key={latestProducts?.map((p) => p._id).join(",")}
-          >
+          <div className="w-full overflow-x-auto relative">
             <button
               onClick={() => swiperInstance?.slidePrev()}
               className="absolute left-7 xl:left-[calc((100%-1200px)/2)] top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg rounded-full p-2 hover:bg-red-600 hover:text-white cursor-pointer transition-colors block"
@@ -94,10 +83,6 @@ const LatestProducts = () => {
             </button>
 
             <Swiper
-              key={latestProducts?.map((p) => p._id).join(",")}
-              observer={true}
-              observeParents={true}
-              observeSlideChildren={true}
               onSwiper={setSwiperInstance}
               freeMode={true}
               modules={[FreeMode]}
@@ -115,7 +100,7 @@ const LatestProducts = () => {
               {isLoading ? (
                 <ProductsSkelton />
               ) : (
-                latestProducts.map((product) => (
+                products.map((product) => (
                   <SwiperSlide
                     key={product._id}
                     className="!w-64 !flex-shrink-0"
@@ -224,7 +209,7 @@ const LatestProducts = () => {
 
                         {/* Add to Cart Button */}
                         {/* Add to Cart Button */}
-                        <Button className="w-full cursor-pointer text-red-500 border rounded-sm border-red-400 hover:bg-black hover:border-transparent bg-transparent hover:text-white transition-colors transition-border duration-300 text-xs sm:text-sm">
+                        <Button className="w-full cursor-pointer text-black  rounded-sm border-[1px] border-black hover:bg-black hover:border-transparent bg-transparent hover:text-white transition-colors transition-border duration-300 text-xs sm:text-sm">
                           <ShoppingCart className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                           ADD TO CART
                         </Button>
@@ -257,4 +242,4 @@ const LatestProducts = () => {
   );
 };
 
-export default LatestProducts;
+export default FashionProducts;

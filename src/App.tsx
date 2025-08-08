@@ -40,6 +40,8 @@ import { clearUser, setUser } from "./redux/reducer/userReducer";
 import ResetPassword from "./frontend/components/account/ResetPassword";
 import ProtectedRoute from "./lib/ProtectedRoute";
 import type { RootState } from "./redux/store";
+import { MyAccount } from "./frontend/pages/MyAccount";
+import EditProduct from "./admin/components/EditProduct";
 
 export default function App() {
   const Dispatch = useDispatch();
@@ -127,7 +129,6 @@ export default function App() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/reset-password"
           element={
@@ -136,6 +137,14 @@ export default function App() {
                 <ResetPassword />
               </MainLayout>
             </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/my-account"
+          element={
+            <MainLayout>
+              <MyAccount />
+            </MainLayout>
           }
         />
 
@@ -181,6 +190,7 @@ export default function App() {
           <Route index element={<Dashboard />} />
           <Route path="orders" element={<Orders />} />
           <Route path="products" element={<Products />} />
+          <Route path="product/:id" element={<EditProduct />} />
           <Route path="product/new" element={<AddProduct />} />
           <Route path="coupon" element={<Coupon />} />
           <Route path="stocks" element={<Stock />} />
@@ -200,13 +210,6 @@ export default function App() {
         autoClose={3000}
         stacked
         hideProgressBar
-        toastClassName={() =>
-          "flex items-center  gap-3 bg-gray-200 shadow-lg px-5 py-2 rounded-[3px] text-black text-lg text-center font-semibold  min-h-[70px] max-w-[25vw] w-fit"
-        }
-        style={{
-          width: "25vw",
-          top: "30px",
-        }}
       />
     </BrowserRouter>
   );

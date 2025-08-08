@@ -1,4 +1,9 @@
-import type { ApiResponse, RegisterPayload } from "@/frontend/types/api-types";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import type {
+  ApiResponse,
+  RegisterPayload,
+  updateUserPayload,
+} from "@/frontend/types/api-types";
 import type { User } from "@/frontend/types/types";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import axios from "axios";
@@ -7,6 +12,7 @@ export const userApi = createApi({
   reducerPath: "userApi",
   baseQuery: fetchBaseQuery({
     baseUrl: `${import.meta.env.VITE_SERVER}/api/v1/user`,
+    credentials: "include",
   }),
   tagTypes: ["users"],
   endpoints: (builder) => ({
@@ -18,10 +24,55 @@ export const userApi = createApi({
       }),
       invalidatesTags: ["users"],
     }),
+
+    updateUser: builder.mutation<
+      ApiResponse<User>,
+      { id: string; data: updateUserPayload }
+    >({
+      query: ({ id, data }) => ({
+        url: `/${id}`,
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: ["users"],
+    }),
+
+    updateUserImage: builder.mutation<
+      ApiResponse<User>,
+      { id: string; image: File }
+    >({
+      query: ({ id, image }) => {
+        const formData = new FormData();
+        formData.append("picture", image);
+
+        return {
+          url: `/${id}`,
+          method: "PATCH",
+          body: formData,
+        };
+      },
+      invalidatesTags: ["users"],
+    }),
+
+    getAllUsers: builder.query<
+      ApiResponse<User[]>,
+      Record<string, string | number>
+    >({
+      query: (params) => {
+        const queryString = new URLSearchParams(params as any).toString();
+        return `/all-users?${queryString}`;
+      },
+      providesTags: ["users"],
+    }),
   }),
 });
 
-export const { useRegisterMutation } = userApi;
+export const {
+  useRegisterMutation,
+  useUpdateUserMutation,
+  useUpdateUserImageMutation,
+  useGetAllUsersQuery,
+} = userApi;
 
 export const getUser = async () => {
   try {
