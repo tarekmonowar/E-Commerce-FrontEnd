@@ -3,6 +3,7 @@ export type ShippingAddress = {
   phone?: string;
   address?: string;
   city?: string;
+  pinCode?: number | null;
 };
 
 export type AuthProvider =
@@ -51,4 +52,73 @@ export type CustomError = {
     errorSource?: { path: string; message: string }[];
     stack?: string;
   };
+};
+
+export type CartItem = {
+  productId: string;
+  photo: string;
+  name: string;
+  price: number;
+  quantity: number;
+  stock: number;
+};
+
+export interface CartReducerInitialState {
+  loading: boolean;
+  cartItems: CartItem[];
+  subtotal: number;
+  shippingCharges: number;
+  discount: number;
+  total: number;
+  shippingInfo: ShippingAddress;
+  coupon: string | undefined;
+}
+
+export type orderItem = {
+  productId: string;
+  photo: string;
+  name: string;
+  price: number;
+  quantity: number;
+};
+
+export type Order = {
+  orderItems: orderItem[];
+  shippingInfo: ShippingAddress;
+  subtotal: number;
+  shippingCharges: number;
+  discount: number;
+  total: number;
+  status: OrderStatus;
+  transactionId: string;
+  user: {
+    name: string;
+    _id: string;
+    email?: string;
+  };
+  _id: string;
+};
+
+export type NewOrderRequest = {
+  shippingInfo: ShippingAddress;
+  orderItems: CartItem[];
+  subtotal: number;
+  shippingCharges: number;
+  discount: number;
+  total: number;
+  transactionId: string;
+};
+
+export const OrderStatus = {
+  PROCESSING: "Processing",
+  SHIPPED: "Shipped",
+  DELIVERED: "Delivered",
+  CANCELLED: "Cancelled",
+} as const;
+
+export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus];
+
+export type UpdateOrderRequest = {
+  orderId: string;
+  status: OrderStatus;
 };

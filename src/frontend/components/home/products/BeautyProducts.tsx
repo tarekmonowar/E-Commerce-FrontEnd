@@ -18,9 +18,16 @@ import { FreeMode } from "swiper/modules";
 import { Swiper, SwiperSlide, type SwiperClass } from "swiper/react";
 import ProductModal from "./ProductModal";
 import { useGetAllProductsQuery } from "@/redux/api/productApi";
-import type { CustomError, Product } from "@/frontend/types/types";
+import type {
+  CartItem,
+  CartReducerInitialState,
+  CustomError,
+  Product,
+} from "@/frontend/types/types";
 import { toast } from "react-toastify";
 import ProductsSkelton from "../../utils/ProductsSkelton";
+import { addToCart } from "@/redux/reducer/cartReducer";
+import { useDispatch, useSelector } from "react-redux";
 
 const BeautyProducts = () => {
   const [hoveredProduct, setHoveredProduct] = useState<string | null>(null);
@@ -28,6 +35,10 @@ const BeautyProducts = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [swiperInstance, setSwiperInstance] = useState<SwiperClass | null>(
     null,
+  );
+
+  const { cartItems } = useSelector(
+    (state: { cartReducer: CartReducerInitialState }) => state.cartReducer,
   );
 
   const { data, isLoading, isError, error } = useGetAllProductsQuery({
@@ -45,10 +56,30 @@ const BeautyProducts = () => {
   }, [isError, error]);
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleOpenModal = (product: Product) => {
     setSelectedProduct(product);
     setModalOpen(true);
+  };
+
+  //*Cart Handler
+
+  const addToCartHandler = (cartItem: CartItem) => {
+    if (cartItem.stock < 1) {
+      return toast.error("Out of Stock");
+    }
+
+    const alreadyInCart = cartItems.some(
+      (item) => item.productId === cartItem.productId,
+    );
+
+    if (alreadyInCart) {
+      return toast.error("Item already in cart");
+    }
+
+    dispatch(addToCart(cartItem));
+    toast.success("Item added to cart!");
   };
 
   return (
@@ -101,7 +132,7 @@ const BeautyProducts = () => {
               {isLoading ? (
                 <ProductsSkelton />
               ) : (
-                products.map((product) => (
+                products?.map((product) => (
                   <SwiperSlide
                     key={product._id}
                     className="!w-64 !flex-shrink-0"
@@ -163,6 +194,17 @@ const BeautyProducts = () => {
                             </Button>
 
                             <Button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                addToCartHandler({
+                                  productId: product._id,
+                                  price: product.discountPrice!,
+                                  name: product.name,
+                                  photo: product.photos[0].url,
+                                  stock: product.stock,
+                                  quantity: 1,
+                                });
+                              }}
                               size="sm"
                               variant="secondary"
                               className="rounded-full w-8 h-8 sm:w-10 sm:h-10 p-0 text-black bg-white font-bold hover:bg-red-500 hover:text-white cursor-pointer"
@@ -209,8 +251,20 @@ const BeautyProducts = () => {
                         </div>
 
                         {/* Add to Cart Button */}
-                        {/* Add to Cart Button */}
-                        <Button className="w-full cursor-pointer text-black  rounded-sm border-[1px] border-black hover:bg-black hover:border-transparent bg-transparent hover:text-white transition-colors transition-border duration-300 text-xs sm:text-sm">
+                        <Button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            addToCartHandler({
+                              productId: product._id,
+                              price: product.discountPrice!,
+                              name: product.name,
+                              photo: product.photos[0].url,
+                              stock: product.stock,
+                              quantity: 1,
+                            });
+                          }}
+                          className="w-full cursor-pointer text-black  rounded-sm border-[1px] border-black hover:bg-black hover:border-transparent bg-transparent hover:text-white transition-colors transition-border duration-300 text-xs sm:text-sm"
+                        >
                           <ShoppingCart className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                           ADD TO CART
                         </Button>

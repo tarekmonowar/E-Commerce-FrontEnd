@@ -6,129 +6,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
-type OrderItem = {
-  _id: string;
-  name: string;
-  photo: string;
-  price: number;
-  quantity: number;
-  productId: string;
-};
-
-type OrderData = {
-  _id: string;
-  shippingInfo: {
-    address: string;
-  };
-  subtotal: number;
-  tax: number;
-  shippingCharges: number;
-  discount: number;
-  total: number;
-  status: string;
-  orderItems: OrderItem[];
-};
-
-const user = {
-  name: "Tarek Monowar",
-};
-// 🧪 Mock Data
-const orders: OrderData[] = [
-  {
-    _id: "68552bccff9ad2888f855bde",
-    shippingInfo: {
-      address: "jaintapur,sylhet",
-    },
-    subtotal: 4466,
-    tax: 804,
-    shippingCharges: 0,
-    discount: 0,
-    total: 5270,
-    status: "processing",
-    orderItems: [
-      {
-        _id: "68552bccff9ad2888f855bdf",
-        name: "FCK",
-        photo: "uploads\\3b4bc01d-4da7-420a-8359-926f199a35cf.png",
-        price: 3455,
-        quantity: 1,
-        productId: "685463f7148a2a1a508a397f",
-      },
-      {
-        _id: "68552bccff9ad2888f855be0",
-        name: "man camera",
-        photo: "uploads\\6c0e7322-6041-4aca-9460-88516e8acffe.jpg",
-        price: 1011,
-        quantity: 1,
-        productId: "6835938a8d9a0b42b228546e",
-      },
-    ],
-  },
-  {
-    _id: "68552bccff9ad888f855bde",
-    shippingInfo: {
-      address: "jaintapur,sylhet",
-    },
-    subtotal: 4466,
-    tax: 804,
-    shippingCharges: 0,
-    discount: 0,
-    total: 5270,
-    status: "shipped",
-    orderItems: [
-      {
-        _id: "68552bccff9ad2888f855bdf",
-        name: "FCK",
-        photo: "uploads\\3b4bc01d-4da7-420a-8359-926f199a35cf.png",
-        price: 3455,
-        quantity: 1,
-        productId: "685463f7148a2a1a508a397f",
-      },
-      {
-        _id: "68552bccff9ad2888f855be0",
-        name: "man camera",
-        photo: "uploads\\6c0e7322-6041-4aca-9460-88516e8acffe.jpg",
-        price: 1011,
-        quantity: 1,
-        productId: "6835938a8d9a0b42b228546e",
-      },
-    ],
-  },
-  {
-    _id: "68552bccff9ad28asf855bde",
-    shippingInfo: {
-      address: "jaintapur,sylhet",
-    },
-    subtotal: 4466,
-    tax: 804,
-    shippingCharges: 0,
-    discount: 0,
-    total: 5270,
-    status: "delivered",
-    orderItems: [
-      {
-        _id: "68552bccff9ad2888f855bdf",
-        name: "FCK",
-        photo: "uploads\\3b4bc01d-4da7-420a-8359-926f199a35cf.png",
-        price: 3455,
-        quantity: 1,
-        productId: "685463f7148a2a1a508a397f",
-      },
-      {
-        _id: "68552bccff9ad2888f855be0",
-        name: "man camera",
-        photo: "uploads\\6c0e7322-6041-4aca-9460-88516e8acffe.jpg",
-        price: 1011,
-        quantity: 1,
-        productId: "6835938a8d9a0b42b228546e",
-      },
-    ],
-  },
-];
+import { useMyOrdersQuery } from "@/redux/api/orderApi";
+import { Printer } from "lucide-react";
+import { useEffect } from "react";
+import { toast } from "react-toastify";
+import type { CustomError, Order } from "../types/types";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Link } from "react-router-dom";
 
 // 🖨️ Print Function
-const handlePrint = (order: OrderData) => {
+const handlePrint = (order: Order) => {
   const printWindow = document.createElement("iframe");
   printWindow.style.position = "fixed";
   printWindow.style.right = "0";
@@ -162,16 +49,20 @@ const handlePrint = (order: OrderData) => {
         <style>
           body { font-family: Arial; padding: 20px; }
           h2 { color: #2C742F; }
+          h3 { color: #000; background-color: #E5E7EB;  padding: 5px 0; border-radius: 4px;}
           table { width: 100%; border-collapse: collapse; margin-top: 20px; }
           th, td { border: 1px solid #000; padding: 8px; text-align: left; }
         </style>
       </head>
       <body>
         <h2>Order ID: ${order._id}</h2>
+        <h3>Transaction ID: ${order.transactionId}</h3>
         <p><strong>Status:</strong> ${order.status}</p>
-        <p><strong>User Name:</strong> ${user.name}</p>
+        <p><strong>Name:</strong> ${order.shippingInfo.name}</p>
         <p><strong>Shipping Address:</strong> ${order.shippingInfo.address}</p>
-        <p><strong>Total:</strong> $${order.total}</p>
+        <p><strong>Shipping Charge:</strong> $${order.shippingCharges}</p>
+        <p><strong>Discount:</strong> $${order.discount}</p>
+        <p><strong>Total:</strong>  $${order.total}</p>
 
         <h3>Items</h3>
         <table>
@@ -209,6 +100,17 @@ const handlePrint = (order: OrderData) => {
 
 // 📦 Main Component
 export default function Orders() {
+  const { data, isLoading, isError, error } = useMyOrdersQuery();
+
+  useEffect(() => {
+    if (isError) {
+      const err = error as CustomError;
+      toast.error(err?.data?.message || "Something went wrong");
+    }
+  }, [isError, error]);
+
+  const orders = data?.data as Order[];
+
   return (
     <section className="bg-gray-100 min-h-[60vh] pt-5">
       <div className="p-6 max-w-7xl mx-auto bg-gray-50 rounded shadow-sm">
@@ -219,13 +121,16 @@ export default function Orders() {
               <TableHead className="font-semibold text-black text-lg">
                 Order ID
               </TableHead>
-              <TableHead className="font-semibold  text-black text-lg">
-                Total
-              </TableHead>
-              <TableHead className="font-semibold text-black  text-lg">
+              <TableHead className="font-semibold text-center text-black text-lg">
                 Items
               </TableHead>
-              <TableHead className="font-semibold  text-black text-lg">
+              <TableHead className="font-semibold text-center text-black  text-lg">
+                Discount
+              </TableHead>
+              <TableHead className="font-semibold text-center text-black  text-lg">
+                Amount
+              </TableHead>
+              <TableHead className="font-semibold text-center text-black text-lg">
                 Status
               </TableHead>
               <TableHead className="font-semibold text-black  text-lg text-center">
@@ -234,67 +139,106 @@ export default function Orders() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {orders.map((order) => (
-              <TableRow
-                key={order._id}
-                className="border-b border-gray-300 hover:bg-gray-100 transition"
-              >
-                <TableCell>{order._id}</TableCell>
-                <TableCell>${order.total}</TableCell>
-                <TableCell>{order.orderItems.length}</TableCell>
-                <TableCell>
-                  {(() => {
-                    switch (order.status) {
-                      case "delivered":
-                        return (
-                          <span className="font-bold text-[16px]  text-[rgb(47,0,255)]">
-                            Delivered
-                          </span>
-                        );
-                      case "cancel":
-                        return (
-                          <span className="font-bold text-[16px] text-red-500">
-                            Cancel
-                          </span>
-                        );
-                      case "shipped":
-                        return (
-                          <span className="text-green-800 text-[16px]  font-bold">
-                            Shipped
-                          </span>
-                        );
-                      case "processing":
-                        return (
-                          <span className="font-bold text-[16px] text-orange-600">
-                            Processing
-                          </span>
-                        );
-                      default:
-                        return (
-                          <span className="text-gray-500 text-[16px]">
-                            {order.status}
-                          </span>
-                        );
-                    }
-                  })()}
-                </TableCell>
+            {isLoading
+              ? Array.from({ length: 15 }).map((_, index) => (
+                  <TableRow key={index} className="border-b border-gray-300">
+                    <TableCell>
+                      <Skeleton className="h-7 w-52 rounded" />
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Skeleton className="h-7 w-6 rounded mx-auto" />
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Skeleton className="h-7 w-8 rounded mx-auto" />
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Skeleton className="h-7 w-16 rounded mx-auto" />
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Skeleton className="h-7 w-23 rounded mx-auto" />
+                    </TableCell>
+                    <TableCell className="flex gap-2 justify-center">
+                      <Skeleton className="h-7 w-21 rounded" />
+                      <Skeleton className="h-7 w-21 rounded" />
+                      <Skeleton className="h-7 w-8 rounded" />
+                    </TableCell>
+                  </TableRow>
+                ))
+              : orders?.map((order) => (
+                  <TableRow
+                    key={order._id}
+                    className="border-b border-gray-300 hover:bg-gray-100 transition"
+                  >
+                    <TableCell>{order._id}</TableCell>
+                    <TableCell className="text-center">
+                      {order.orderItems.length}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      ${order.discount}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      ${order.total}
+                    </TableCell>
 
-                <TableCell className="flex gap-2 justify-center">
-                  <button
-                    onClick={() => handlePrint(order)}
-                    className="px-4 py-1 rounded bg-black text-white hover:bg-white hover:text-black border border-black transition cursor-pointer"
-                  >
-                    Print
-                  </button>
-                  <button
-                    // onClick={() => handleDetails(order)}
-                    className="px-4 py-1 rounded bg-white text-black hover:bg-gray-200 font-semibold border  transition cursor-pointer"
-                  >
-                    Details
-                  </button>
-                </TableCell>
-              </TableRow>
-            ))}
+                    <TableCell className="text-center">
+                      {(() => {
+                        switch (order.status) {
+                          case "Delivered":
+                            return (
+                              <span className="font-bold text-[16px]  text-[rgb(47,0,255)]">
+                                Delivered
+                              </span>
+                            );
+                          case "Cancelled":
+                            return (
+                              <span className="font-bold text-[16px] text-red-500">
+                                Cancelled
+                              </span>
+                            );
+                          case "Shipped":
+                            return (
+                              <span className="text-green-800 text-[16px]  font-bold">
+                                Shipped
+                              </span>
+                            );
+                          case "Processing":
+                            return (
+                              <span className="font-bold text-[16px] text-[#b17a32]">
+                                Processing
+                              </span>
+                            );
+                          default:
+                            return (
+                              <span className="text-gray-500 text-[16px]">
+                                {order.status}
+                              </span>
+                            );
+                        }
+                      })()}
+                    </TableCell>
+
+                    <TableCell className="flex gap-2 justify-center">
+                      <Link
+                        to={`/order-details/${order._id}`}
+                        className="px-4 py-1 rounded bg-black text-white hover:bg-white hover:text-black border border-black transition cursor-pointer"
+                      >
+                        Details
+                      </Link>
+                      <button
+                        // onClick={() => handleDetails(order)}
+                        className="px-4 py-1 rounded bg-white text-black hover:bg-gray-200 font-semibold border  transition cursor-pointer"
+                      >
+                        Invoice
+                      </button>
+                      <button
+                        onClick={() => handlePrint(order)}
+                        className="px-2 py-1 rounded bg-black text-white hover:bg-white hover:text-black border border-black transition cursor-pointer"
+                      >
+                        <Printer size={17} />
+                      </button>
+                    </TableCell>
+                  </TableRow>
+                ))}
           </TableBody>
         </Table>
       </div>

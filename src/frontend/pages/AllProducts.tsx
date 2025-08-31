@@ -18,10 +18,17 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import ProductModal from "../components/home/products/ProductModal";
-import type { CustomError, Product } from "../types/types";
+import type {
+  CartItem,
+  CartReducerInitialState,
+  CustomError,
+  Product,
+} from "../types/types";
 import PriceRangeSlider from "../components/utils/PriceRangeSlider";
 import { Skeleton } from "@/components/ui/skeleton";
 import AllProductsSkeleton from "../components/utils/AllProductsSkelton.tsx";
+import { useDispatch, useSelector } from "react-redux";
+import { addToCart } from "@/redux/reducer/cartReducer.ts";
 
 export default function AllProducts() {
   const [searchParams] = useSearchParams();
@@ -38,6 +45,7 @@ export default function AllProducts() {
   const [layoutType, setLayoutType] = useState<"grid" | "list">("grid");
   const [categoryExpanded, setCategoryExpanded] = useState(true);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const queryParams = useMemo(() => {
     const query: Record<string, string> = {};
@@ -72,6 +80,9 @@ export default function AllProducts() {
   //     "ratings": ratings.join(","),
   //   }
 
+  const { cartItems } = useSelector(
+    (state: { cartReducer: CartReducerInitialState }) => state.cartReducer,
+  );
   const { data, isError, error, isLoading } =
     useGetAllProductsQuery(queryParams);
   const { data: priceRangeData } = useProductPriceRangeQuery();
@@ -167,6 +178,25 @@ export default function AllProducts() {
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");
   }
+
+  //*Cart Handler
+
+  const addToCartHandler = (cartItem: CartItem) => {
+    if (cartItem.stock < 1) {
+      return toast.error("Out of Stock");
+    }
+
+    const alreadyInCart = cartItems.some(
+      (item) => item.productId === cartItem.productId,
+    );
+
+    if (alreadyInCart) {
+      return toast.error("Item already in cart");
+    }
+
+    dispatch(addToCart(cartItem));
+    toast.success("Item added to cart!");
+  };
 
   return (
     <div className="bg-slate-100 min-h-screen">
@@ -407,6 +437,17 @@ export default function AllProducts() {
                           </Button>
 
                           <Button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              addToCartHandler({
+                                productId: product._id,
+                                price: product.discountPrice!,
+                                name: product.name,
+                                photo: product.photos[0].url,
+                                stock: product.stock,
+                                quantity: 1,
+                              });
+                            }}
                             size="sm"
                             variant="secondary"
                             className="rounded-full w-8 h-8 sm:w-10 sm:h-10 p-0 text-black bg-white font-bold hover:bg-red-500 hover:text-white cursor-pointer"
@@ -471,6 +512,17 @@ export default function AllProducts() {
 
                       {/* Add to Cart Button */}
                       <Button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          addToCartHandler({
+                            productId: product._id,
+                            price: product.discountPrice!,
+                            name: product.name,
+                            photo: product.photos[0].url,
+                            stock: product.stock,
+                            quantity: 1,
+                          });
+                        }}
                         className={` cursor-pointer text-red-500 rounded-sm border border-red-500 hover:bg-red-500 hover:border-transparent bg-transparent hover:text-white transition-colors duration-300 text-xs sm:text-sm ${
                           layoutType === "list" ? "w-52" : "w-full"
                         }`}
@@ -496,3 +548,148 @@ export default function AllProducts() {
     </div>
   );
 }
+
+// //
+// // ✅ Constants moved outside to avoid re-creation on each render
+// const PRICE_THRESHOLDS = [500, 1000, 1500, 2000, 3000, 5000, 10000];
+// const DEMO_CATEGORIES = [
+//   "fashion",
+//   "electronics",
+//   "bags",
+//   "footwear",
+//   "groceries",
+//   "beauty",
+//   "wellness",
+//   "jewellery",
+//   "home & garden",
+//   "sports",
+//   "automotive",
+//   "books",
+// ];
+
+// export const ProductsPage = () => {
+//   const dispatch = useDispatch();
+//   const { cartItems } = useSelector(
+//     (state: { cartReducer: CartReducerInitialState }) => state.cartReducer
+//   );
+
+//   // 🔹 Memoized Query Params
+//   const queryParams = useMemo(() => {
+//     const query: Record<string, string> = {};
+
+//     if (selectedCategories.length)
+//       query.category = selectedCategories.join(",");
+
+//     if (selectedRatings.length)
+//       query.ratings = selectedRatings.join(",");
+
+//     query["discountPrice[gte]"] = String(minPrice);
+//     query["discountPrice[lte]"] = String(maxPrice);
+
+//     query.sort =
+//       sort === "asc"
+//         ? "discountPrice"
+//         : sort === "dsc"
+//         ? "-discountPrice"
+//         : "-createdAt";
+
+//     return query;
+//   }, [selectedCategories, selectedRatings, minPrice, maxPrice, sort]);
+
+//   // 🔹 API Calls
+//   const { data, isError, error, isLoading } = useGetAllProductsQuery(queryParams);
+//   const { data: priceRangeData } = useProductPriceRangeQuery();
+//   const { data: categoriesData, isLoading: categoriesLoading } = useProductsCategoriesQuery();
+
+//   const products = data?.data ?? [];
+//   const categories = categoriesData?.data ?? DEMO_CATEGORIES;
+
+//   // 🔹 Error Handling (cleaner)
+//   useEffect(() => {
+//     if (isError) {
+//       const err = error as CustomError;
+//       toast.error(err?.data?.message || "Something went wrong");
+//     }
+//   }, [isError, error]);
+
+//   // 🔹 Price Range Normalization
+//   useEffect(() => {
+//     if (!priceRangeData?.data) return;
+//     const rawMax = Number(priceRangeData.data.maxPrice);
+//     let professionalMax = PRICE_THRESHOLDS.find((t) => rawMax <= t);
+//     if (!professionalMax) professionalMax = Math.ceil(rawMax / 1000) * 1000;
+
+//     setMaxPrice(professionalMax);
+//     setMaxPriceInput(professionalMax);
+//   }, [priceRangeData?.data]);
+
+//   // 🔹 Scroll to top on param change
+//   useEffect(() => {
+//     window.scrollTo(0, 0);
+//   }, [searchParams]);
+
+//   // 🔹 Category from URL
+//   useEffect(() => {
+//     const initialCategory = searchParams.get("category");
+//     if (initialCategory) setSelectedCategories([initialCategory]);
+//   }, [searchParams]);
+
+//   // 🔹 Handlers (memoized)
+//   const handleCategoryChange = useCallback((cat: string) => {
+//     setSelectedCategories((prev) =>
+//       prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]
+//     );
+//   }, []);
+
+//   const handleRatingChange = useCallback((rating: number) => {
+//     setSelectedRatings((prev) =>
+//       prev.includes(rating) ? prev.filter((r) => r !== rating) : [...prev, rating]
+//     );
+//   }, []);
+
+//   const addToCartHandler = useCallback(
+//     (cartItem: CartItem) => {
+//       if (cartItem.stock < 1) return toast.error("Out of Stock");
+
+//       const alreadyInCart = cartItems.some(
+//         (item) => item.productId === cartItem.productId
+//       );
+//       if (alreadyInCart) return toast.error("Item already in cart");
+
+//       dispatch(addToCart(cartItem));
+//       toast.success("Item added to cart!");
+//     },
+//     [cartItems, dispatch]
+//   );
+
+//   // 🔹 Utility rendering
+//   const getRatingStars = useCallback((rating: number) => {
+//     return [...Array(5)].map((_, i) => (
+//       <Star
+//         key={i}
+//         className={`w-5 h-5 ${
+//           i < rating ? "fill-yellow-600 text-yellow-600" : "text-gray-400"
+//         }`}
+//       />
+//     ));
+//   }, []);
+
+//   return (
+//     <div>
+//       {isLoading ? (
+//         <p>Loading products...</p> // 👉 Replace with skeleton loader
+//       ) : (
+//         products.map((product) => (
+//           <ProductCard
+//             key={product._id}
+//             product={product}
+//             addToCart={addToCartHandler}
+//             getRatingStars={getRatingStars}
+//           />
+//         ))
+//       )}
+//     </div>
+//   );
+// };
+
+// //

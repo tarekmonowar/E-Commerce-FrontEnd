@@ -1,6 +1,16 @@
 import { cn } from "@/lib/utils";
+import type { RootState } from "@/redux/store";
 import { FiMinus, FiPlus, FiShoppingCart, FiTrash2, FiX } from "react-icons/fi";
 import { toast } from "react-toastify";
+import { useDispatch, useSelector } from "react-redux";
+import type { CartItem, CartReducerInitialState } from "@/frontend/types/types";
+import { useEffect, useState } from "react";
+import {
+  addToCart,
+  calculatePrice,
+  removeCartItem,
+} from "@/redux/reducer/cartReducer";
+import { useNavigate } from "react-router-dom";
 
 type CartModalProps = {
   isOpen: boolean;
@@ -8,87 +18,65 @@ type CartModalProps = {
 };
 
 const CartModal = ({ isOpen, onClose }: CartModalProps) => {
-  const cartItems = [
-    {
-      _id: "1",
-      name: "Nike Air Max 270",
-      price: 129.99,
-      quantity: 2,
-      imageUrl: "/images/airmax270.jpg",
-    },
-    {
-      _id: "2",
-      name: "Apple Watch Series 9",
-      price: 399.0,
-      quantity: 1,
-      imageUrl: "/images/applewatch.jpg",
-    },
-    // Add more dummy items for testing scroll
-    {
-      _id: "3",
-      name: "Sony WH-1000XM5",
-      price: 349.99,
-      quantity: 1,
-      imageUrl: "/images/headphones.jpg",
-    },
-    {
-      _id: "4",
-      name: "Samsung Galaxy Buds",
-      price: 129.99,
-      quantity: 2,
-      imageUrl: "/images/buds.jpg",
-    },
-    {
-      _id: "5",
-      name: "Fitbit Charge 5",
-      price: 149.99,
-      quantity: 1,
-      imageUrl: "/images/fitbit.jpg",
-    },
-    {
-      _id: "6",
-      name: "Logitech MX Master 3",
-      price: 99.99,
-      quantity: 1,
-      imageUrl: "/images/mouse.jpg",
-    },
-    {
-      _id: "7",
-      name: "Kindle Paperwhite",
-      price: 139.99,
-      quantity: 1,
-      imageUrl: "/images/kindle.jpg",
-    },
-    {
-      _id: "8",
-      name: "GoPro Hero 11",
-      price: 499.0,
-      quantity: 1,
-      imageUrl: "/images/gopro.jpg",
-    },
-    {
-      _id: "7",
-      name: "Kindle Paperwhite",
-      price: 139.99,
-      quantity: 1,
-      imageUrl: "/images/kindle.jpg",
-    },
-    {
-      _id: "8",
-      name: "GoPro Hero 11",
-      price: 499.0,
-      quantity: 1,
-      imageUrl: "/images/gopro.jpg",
-    },
-  ];
+  const user = useSelector((state: RootState) => state.userReducer.user);
 
-  const user = false;
+  const { cartItems, subtotal } = useSelector(
+    (state: { cartReducer: CartReducerInitialState }) => state.cartReducer,
+  );
+
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      dispatch(calculatePrice());
+    }
+  }, [cartItems, isOpen, dispatch]);
+
+  const incrementHandler = (cartItem: CartItem) => {
+    if (cartItem.quantity >= cartItem.stock) {
+      toast.error(
+        `Only ${cartItem.stock} item${
+          cartItem.stock > 1 ? "s" : ""
+        } available in stock.`,
+      );
+      return;
+    }
+
+    dispatch(addToCart({ ...cartItem, quantity: cartItem.quantity + 1 }));
+  };
+
+  const decrementHandler = (cartItem: CartItem) => {
+    if (cartItem.quantity <= 1) {
+      toast.info("Minimum quantity is 1.");
+      return;
+    }
+
+    dispatch(addToCart({ ...cartItem, quantity: cartItem.quantity - 1 }));
+  };
+
+  const removeHandler = (productId: string) => {
+    dispatch(removeCartItem(productId));
+    toast.success("Item removed from your cart.");
+  };
 
   const handleProceedToCheckout = () => {
+    setLoading(true);
     if (!user) {
       toast.error("Please sign in to proceed with checkout");
+      setTimeout(() => {
+        navigate("/sign-in");
+        onClose();
+        setLoading(false);
+      }, 1000);
     } else {
-      toast.success("ready for checking");
+      toast.success("Ready for checkout");
+      setTimeout(() => {
+        navigate("/cart");
+        onClose();
+        setLoading(false);
+      }, 1000);
     }
   };
 
@@ -154,11 +142,11 @@ const CartModal = ({ isOpen, onClose }: CartModalProps) => {
                   <div className="space-y-3">
                     {cartItems.map((item) => (
                       <div
-                        key={`${item._id}-${item.name}`}
+                        key={`${item.productId}-${item.name}`}
                         className="flex gap-4 bg-white rounded-lg p-3 border border-gray-200 hover:shadow-lg transition"
                       >
                         <img
-                          src={item.imageUrl}
+                          src={item.photo}
                           alt={item.name}
                           className="w-20 h-20 object-cover rounded-md"
                         />
@@ -169,17 +157,26 @@ const CartModal = ({ isOpen, onClose }: CartModalProps) => {
                           </h3>
                           <div className="mt-2 flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                              <button className="p-2 hover:bg-gray-100 rounded-full">
+                              <button
+                                onClick={() => decrementHandler(item)}
+                                className="p-2 hover:bg-gray-100 rounded-full cursor-pointer"
+                              >
                                 <FiMinus className="w-5 h-5" />
                               </button>
                               <span className="w-8 text-center font-medium">
                                 {item.quantity}
                               </span>
-                              <button className="p-2 hover:bg-gray-100 rounded-full">
+                              <button
+                                onClick={() => incrementHandler(item)}
+                                className="p-2 hover:bg-gray-100 rounded-full cursor-pointer"
+                              >
                                 <FiPlus className="w-5 h-5" />
                               </button>
                             </div>
-                            <button className="p-2 text-red-500 hover:bg-red-50 rounded-full">
+                            <button
+                              onClick={() => removeHandler(item.productId)}
+                              className="p-2 text-red-500 hover:bg-red-50 rounded-full cursor-pointer"
+                            >
                               <FiTrash2 className="w-5 h-5" />
                             </button>
                           </div>
@@ -205,16 +202,39 @@ const CartModal = ({ isOpen, onClose }: CartModalProps) => {
                   <div className="flex justify-between items-center mb-4">
                     <span className="text-lg text-gray-600">Total Amount:</span>
                     <span className="text-2xl font-bold text-[#2B7A0B]">
-                      $ 2190
+                      ${subtotal.toFixed(2)}
                     </span>
                   </div>
                   {!user ? (
                     <>
                       <button
                         onClick={handleProceedToCheckout}
-                        className="w-full bg-[#2B7A0B] text-white py-3 rounded-md hover:bg-[#236209] transition text-lg font-medium cursor-pointer"
+                        disabled={loading}
+                        className="w-full bg-[#236209]  hover:bg-[#2B7A0B] text-white py-3 rounded-md transition text-lg font-medium xl:mb-4 flex items-center justify-center gap-2 cursor-pointer"
                       >
-                        Sign In & Checkout
+                        {loading && (
+                          <svg
+                            className="animate-spin h-5 w-5 text-white"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            ></circle>
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            ></path>
+                          </svg>
+                        )}
+                        {loading ? "Navigating..." : "Sign In & Checkout"}
                       </button>
                       <p className="text-center text-sm text-gray-500 mt-2 xl:mb-4">
                         Sign in for a faster checkout and to save your order
@@ -224,9 +244,32 @@ const CartModal = ({ isOpen, onClose }: CartModalProps) => {
                   ) : (
                     <button
                       onClick={handleProceedToCheckout}
-                      className="w-full bg-[#2B7A0B] text-white py-3 rounded-md hover:bg-[#236209] transition text-lg font-medium xl:mb-4 cursor-pointer"
+                      disabled={loading}
+                      className="w-full bg-[#236209]  hover:bg-[#2B7A0B] text-white py-3 rounded-md transition text-lg font-medium xl:mb-4 flex items-center justify-center gap-2 cursor-pointer"
                     >
-                      Proceed to Checkout
+                      {loading && (
+                        <svg
+                          className="animate-spin h-5 w-5 text-white"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
+                        </svg>
+                      )}
+                      {loading ? "Processing..." : "Proceed to Checkout"}
                     </button>
                   )}
                 </div>

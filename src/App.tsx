@@ -14,6 +14,7 @@ import { getUser } from "./redux/api/userApi";
 //Authenticate routes import
 
 //admin routes import
+import EditProduct from "./admin/components/EditProduct";
 import Layout from "./admin/layout/Layout";
 import AddProduct from "./admin/pages/AddProduct";
 import AllUsers from "./admin/pages/All-users";
@@ -27,21 +28,24 @@ import Settings from "./admin/pages/Settings";
 import Stock from "./admin/pages/Stock";
 import TopCustomers from "./admin/pages/TopCustomers";
 import VerifiedAdmin from "./admin/pages/VerifiedAdmin";
+import ResetPassword from "./frontend/components/account/ResetPassword";
 import SignIn from "./frontend/components/account/SignIn";
 import BlogDetail from "./frontend/components/home/BlogDetails";
 import FooterLink from "./frontend/layout/FooterLink";
 import MainLayout from "./frontend/layout/MainLayout";
 import AllProducts from "./frontend/pages/AllProducts";
+import CartDetails from "./frontend/pages/CartDetails";
+import { MyAccount } from "./frontend/pages/MyAccount";
 import MyOrders from "./frontend/pages/MyOrders";
 import OrderTracking from "./frontend/pages/OrderTracking";
 import ProductDetails from "./frontend/pages/ProductDetails";
+import Shipping from "./frontend/pages/Shipping";
 import Wishlisht from "./frontend/pages/Wishlisht";
-import { clearUser, setUser } from "./redux/reducer/userReducer";
-import ResetPassword from "./frontend/components/account/ResetPassword";
 import ProtectedRoute from "./lib/ProtectedRoute";
+import { clearUser, setUser } from "./redux/reducer/userReducer";
 import type { RootState } from "./redux/store";
-import { MyAccount } from "./frontend/pages/MyAccount";
-import EditProduct from "./admin/components/EditProduct";
+import CheckOut from "./frontend/pages/CheckOut";
+import OrderDetails from "./frontend/pages/orderDetails";
 
 export default function App() {
   const Dispatch = useDispatch();
@@ -111,6 +115,14 @@ export default function App() {
           }
         />
         <Route
+          path="/cart"
+          element={
+            <MainLayout>
+              <CartDetails />
+            </MainLayout>
+          }
+        />
+        <Route
           path="/order-tracking"
           element={
             <MainLayout>
@@ -166,6 +178,30 @@ export default function App() {
             element={
               <MainLayout>
                 <Wishlisht />
+              </MainLayout>
+            }
+          />
+          <Route
+            path="/shipping"
+            element={
+              <MainLayout>
+                <Shipping />
+              </MainLayout>
+            }
+          />
+          <Route
+            path="/pay"
+            element={
+              <MainLayout>
+                <CheckOut />
+              </MainLayout>
+            }
+          />
+          <Route
+            path="/order-details/:id"
+            element={
+              <MainLayout>
+                <OrderDetails />
               </MainLayout>
             }
           />

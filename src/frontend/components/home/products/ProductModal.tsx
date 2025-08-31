@@ -5,9 +5,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import type { Product } from "@/frontend/types/types";
+import type { CartItem, Product } from "@/frontend/types/types";
+import { addToCart } from "@/redux/reducer/cartReducer";
 import { Heart, ShoppingCart, Star } from "lucide-react";
 import { useState } from "react";
+import { toast } from "react-toastify";
+import { useDispatch } from "react-redux";
 
 interface ProductModalProps {
   product: Product | null;
@@ -24,6 +27,7 @@ export default function ProductModal({
   const [isZooming, setIsZooming] = useState(false);
   const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
   const [quantity, setQuantity] = useState(1);
+  const dispatch = useDispatch();
 
   if (!product) return null;
 
@@ -34,13 +38,42 @@ export default function ProductModal({
     setZoomPosition({ x, y });
   };
 
-  const decrement = () => {
+  const incrementHandler = (product: Product) => {
+    if (product.stock <= 0) {
+      toast.error("Out of Stock");
+      setQuantity(1);
+      return;
+    }
+    if (product.stock === quantity) {
+      toast.error(
+        `Only ${product.stock} item${
+          product.stock > 1 ? "s" : ""
+        } available in stock.`,
+      );
+      return;
+    }
+    setQuantity((prev) => prev + 1);
+  };
+
+  const decrementHandler = () => {
+    if (quantity <= 1) {
+      toast.info("Minimum quantity is 1.");
+      return;
+    }
     setQuantity((prev) => (prev > 1 ? prev - 1 : prev));
   };
-  const increment = () => {
-    // if (data?.product?.stock === quantity)
-    //   return toast.error(`${data?.product?.stock} available only`);
-    setQuantity((prev) => prev + 1);
+
+  const addToCartHandler = (cartItem: CartItem) => {
+    if (cartItem.stock < 1) return toast.error("Out of Stock");
+    if (cartItem.quantity < 1) {
+      toast.error("Quantity must be at least 1.");
+      return;
+    }
+
+    dispatch(addToCart(cartItem));
+    toast.success("Added to cart");
+    onClose(false);
+    setQuantity(1);
   };
 
   const handleImageClick = (index: number) => {
@@ -189,14 +222,14 @@ export default function ProductModal({
               <label className="text-md font-medium">Quantity:</label>
               <div>
                 <button
-                  onClick={decrement}
+                  onClick={() => decrementHandler()}
                   className="px-5 bg-gray-300 py-[3px] rounded-[3px] font-semibold text-xl cursor-pointer hover:bg-gray-900 hover:text-white"
                 >
                   -
                 </button>
                 <span className="px-4 text-xl font-semibold">{quantity}</span>
                 <button
-                  onClick={increment}
+                  onClick={() => incrementHandler(product)}
                   className="px-5 bg-gray-300 py-[3px] rounded-[3px] font-semibold text-xl cursor-pointer hover:bg-gray-900 hover:text-white"
                 >
                   +
@@ -208,6 +241,16 @@ export default function ProductModal({
             <div>
               <div className="flex">
                 <Button
+                  onClick={() => {
+                    addToCartHandler({
+                      productId: product._id,
+                      price: product.discountPrice!,
+                      name: product.name,
+                      photo: product.photos[0].url,
+                      stock: product.stock,
+                      quantity: quantity,
+                    });
+                  }}
                   variant="default"
                   className="mr-4 rounded-sm text-white/80 hover:bg-white bg-black hover:text-black border cursor-pointer "
                 >

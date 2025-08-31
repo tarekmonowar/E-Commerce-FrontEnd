@@ -1,66 +1,39 @@
 import { Card } from "@/components/ui/card";
+import { useLazyOrderDetailsQuery } from "@/redux/api/orderApi";
 import { Check, Home, Package, Truck, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import type { CustomError, Order } from "../types/types";
+import { toast } from "react-toastify";
 
-type OrderStatus = "processing" | "shipped" | "delivered" | "cancelled";
-
-interface OrderData {
-  id: string;
-  status: OrderStatus;
-  expectedDate?: string;
-  trackingNumber?: string;
-}
-
-// Mock data for demo purposes
-const mockOrders: Record<string, OrderData> = {
-  Y34XDHR: {
-    id: "Y34XDHR",
-    status: "delivered",
-    expectedDate: "01/12/19",
-    trackingNumber: "23409456724242342289",
-  },
-  ABC123: {
-    id: "ABC123",
-    status: "processing",
-    expectedDate: "15/01/25",
-    trackingNumber: "98765432109876543210",
-  },
-  XYZ789: {
-    id: "XYZ789",
-    status: "shipped",
-    expectedDate: "10/01/25",
-    trackingNumber: "11223344556677889900",
-  },
-  DEF456: {
-    id: "DEF456",
-    status: "cancelled",
-    expectedDate: "",
-    trackingNumber: "",
-  },
-};
+type OrderStatus = "Processing" | "Shipped" | "Delivered" | "Cancelled";
 
 const OrderTracking = () => {
   const [orderId, setOrderId] = useState("");
-  const [orderData, setOrderData] = useState<OrderData | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const getStepStatus = (
-    stepIndex: number,
-    currentStatus: OrderStatus | "unknown",
-  ) => {
-    const statusOrder = ["processing", "shipped", "delivered"];
+  const [trigger, { data, error: apiError, isError, isFetching }] =
+    useLazyOrderDetailsQuery();
 
-    if (currentStatus === "cancelled") {
-      return stepIndex === 0 ? "completed" : "pending";
+  useEffect(() => {
+    if (isError && apiError) {
+      const err = apiError as CustomError;
+      const message = err?.data?.message || "Something went wrong";
+      toast.error(message);
+      setError(message);
     }
+  }, [isError, apiError]);
 
-    if (currentStatus === "unknown") {
-      return "pending";
+  const orderData = data?.data as Order;
+
+  const getStepStatus = (stepIndex: number, currentStatus: OrderStatus) => {
+    const statusOrder = ["Processing", "Shipped", "Delivered"];
+
+    if (currentStatus === "Cancelled") {
+      return stepIndex === 0 ? "Completed" : "Pending";
     }
 
     const currentIndex = statusOrder.indexOf(currentStatus);
-    return stepIndex <= currentIndex ? "completed" : "pending";
+    return stepIndex <= currentIndex ? "Completed" : "Pending";
   };
 
   const handleTrackOrder = async () => {
@@ -69,34 +42,21 @@ const OrderTracking = () => {
       return;
     }
 
-    setIsLoading(true);
     setError("");
-
-    // Simulate API call
-    setTimeout(() => {
-      const order = mockOrders[orderId.toUpperCase()];
-      if (order) {
-        setOrderData(order);
-        setError("");
-      } else {
-        setOrderData(null);
-        setError("Order not found. Please check your Order ID and try again.");
-      }
-      setIsLoading(false);
-    }, 1000);
+    trigger(orderId);
   };
 
-  const getStepIcon = (step: string, status: "completed" | "pending") => {
+  const getStepIcon = (step: string, status: "Completed" | "Pending") => {
     const iconClass = `w-6 h-6 ${
-      status === "completed" ? "text-white" : "text-white"
+      status === "Completed" ? "text-white" : "text-white"
     }`;
 
     switch (step) {
-      case "processing":
+      case "Processing":
         return <Package className={iconClass} />;
-      case "shipped":
+      case "Shipped":
         return <Truck className={iconClass} />;
-      case "delivered":
+      case "Delivered":
         return <Home className={iconClass} />;
       default:
         return <Package className={iconClass} />;
@@ -104,9 +64,21 @@ const OrderTracking = () => {
   };
 
   const steps = [
-    { key: "processing", label: "Order Processed" },
-    { key: "shipped", label: "Order Shipped" },
-    { key: "delivered", label: "Order Delivered" },
+    {
+      key: "Processing",
+      label: "Order Confirmed",
+      text: "We have received your order",
+    },
+    {
+      key: "Shipped",
+      label: "Order Shipped",
+      text: "Your package is on the way",
+    },
+    {
+      key: "Delivered",
+      label: "Order Delivered",
+      text: "Package delivered successfully",
+    },
   ];
 
   return (
@@ -144,10 +116,10 @@ const OrderTracking = () => {
 
               <button
                 onClick={handleTrackOrder}
-                disabled={isLoading}
+                disabled={isFetching}
                 className="bg-black rounded-[5px] border text-white hover:bg-gray-200 hover:text-black transition-colors px-8 py-1 cursor-pointer"
               >
-                {isLoading ? "Tracking..." : "Track"}
+                {isFetching ? "Tracking..." : "Track"}
               </button>
             </div>
 
@@ -165,14 +137,14 @@ const OrderTracking = () => {
           <div className="flex justify-between items-center mb-8">
             <div>
               <h2 className="text-2xl font-bold text-black">
-                ORDER #{orderData?.id}
+                ORDER #{orderData?._id}
               </h2>
             </div>
             <div className="text-right">
-              {orderData?.status !== "cancelled" && (
+              {orderData?.status !== "Cancelled" && (
                 <>
                   <p className="text-sm text-black">
-                    Expected Arrival {orderData?.expectedDate}
+                    Expected Arrival {Date.now()}
                   </p>
                   <p className="text-sm text-black">
                     Your order is{" "}
@@ -183,7 +155,7 @@ const OrderTracking = () => {
                   </p>
                 </>
               )}
-              {orderData?.status === "cancelled" && (
+              {orderData?.status === "Cancelled" && (
                 <p className="text-sm text-black font-semibold">
                   Order Cancelled
                 </p>
@@ -191,7 +163,7 @@ const OrderTracking = () => {
             </div>
           </div>
 
-          {orderData?.status !== "cancelled" ? (
+          {orderData?.status !== "Cancelled" ? (
             <div className="relative">
               {/* Progress Line */}
               <div className="absolute top-6 left-9 right-9 h-[5px] bg-gray-300 rounded-full">
@@ -199,11 +171,11 @@ const OrderTracking = () => {
                   className="h-full bg-[#26852c] rounded-full text-black transition-all duration-500"
                   style={{
                     width:
-                      orderData?.status === "processing"
+                      orderData?.status === "Processing"
                         ? "0%"
-                        : orderData?.status === "shipped"
+                        : orderData?.status === "Shipped"
                         ? "50%"
-                        : orderData?.status === "delivered"
+                        : orderData?.status === "Delivered"
                         ? "100%"
                         : "0%",
                   }}
@@ -213,23 +185,20 @@ const OrderTracking = () => {
               {/* Steps */}
               <div className="flex justify-between relative">
                 {steps.map((step, index) => {
-                  const status = getStepStatus(
-                    index,
-                    orderData?.status ?? "unknown",
-                  );
+                  const status = getStepStatus(index, orderData?.status);
                   return (
                     <div key={step.key} className="flex flex-col items-center">
                       <div
                         className={`
                           w-12 h-12 rounded-full flex items-center justify-center relative z-10 transition-all duration-300
                           ${
-                            status === "completed"
+                            status === "Completed"
                               ? "bg-[#26852c]"
                               : "bg-blue-400"
                           }
                         `}
                       >
-                        {status === "completed" ? (
+                        {status === "Completed" ? (
                           <Check className="w-6 h-6 text-white" />
                         ) : (
                           getStepIcon(step.key, status)
@@ -237,9 +206,10 @@ const OrderTracking = () => {
                       </div>
 
                       <div className="mt-4 text-center">
-                        <p className="text-sm font-medium text-blue-700">
+                        <p className="text-lg font-medium text-blue-700">
                           {step.label}
                         </p>
+                        <p className="text-gray-600 text-[13px]">{step.text}</p>
                       </div>
                     </div>
                   );

@@ -11,7 +11,12 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 // @ts-expect-error TS2307: Cannot find module
 import "swiper/css";
-import type { CustomError, Product } from "@/frontend/types/types";
+import type {
+  CartItem,
+  CartReducerInitialState,
+  CustomError,
+  Product,
+} from "@/frontend/types/types";
 import { useGetAllProductsQuery } from "@/redux/api/productApi";
 import { toast } from "react-toastify";
 // @ts-expect-error TS2307: Cannot find module
@@ -20,6 +25,8 @@ import { FreeMode } from "swiper/modules";
 import { Swiper, SwiperSlide, type SwiperClass } from "swiper/react";
 import ProductsSkelton from "../../utils/ProductsSkelton";
 import ProductModal from "./ProductModal";
+import { addToCart } from "@/redux/reducer/cartReducer";
+import { useDispatch, useSelector } from "react-redux";
 
 const AllCategories = [
   "all",
@@ -41,6 +48,10 @@ const LatestProducts = () => {
   );
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+
+  const { cartItems } = useSelector(
+    (state: { cartReducer: CartReducerInitialState }) => state.cartReducer,
+  );
   const { data, isLoading, isError, error } = useGetAllProductsQuery({
     sort: "-ratings -numOfReviews",
   });
@@ -60,6 +71,7 @@ const LatestProducts = () => {
   };
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   // Memoize filtered products
   const filteredProducts = useMemo(() => {
@@ -67,6 +79,25 @@ const LatestProducts = () => {
       ? products
       : products?.filter((product) => product.category === activeCategory);
   }, [activeCategory, products]);
+
+  //*Cart Handler
+
+  const addToCartHandler = (cartItem: CartItem) => {
+    if (cartItem.stock < 1) {
+      return toast.error("Out of Stock");
+    }
+
+    const alreadyInCart = cartItems.some(
+      (item) => item.productId === cartItem.productId,
+    );
+
+    if (alreadyInCart) {
+      return toast.error("Item already in cart");
+    }
+
+    dispatch(addToCart(cartItem));
+    toast.success("Item added to cart!");
+  };
 
   return (
     <>
@@ -136,7 +167,7 @@ const LatestProducts = () => {
               {isLoading ? (
                 <ProductsSkelton />
               ) : (
-                filteredProducts.map((product) => (
+                filteredProducts?.map((product) => (
                   <SwiperSlide
                     key={product._id}
                     className="!w-64 !flex-shrink-0"
@@ -198,6 +229,17 @@ const LatestProducts = () => {
                             </Button>
 
                             <Button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                addToCartHandler({
+                                  productId: product._id,
+                                  price: product.discountPrice!,
+                                  name: product.name,
+                                  photo: product.photos[0].url,
+                                  stock: product.stock,
+                                  quantity: 1,
+                                });
+                              }}
                               size="sm"
                               variant="secondary"
                               className="rounded-full w-8 h-8 sm:w-10 sm:h-10 p-0 text-black bg-white font-bold hover:bg-red-500 hover:text-white cursor-pointer"
@@ -247,8 +289,20 @@ const LatestProducts = () => {
                         </div>
 
                         {/* Add to Cart Button */}
-                        {/* Add to Cart Button */}
-                        <Button className="w-full cursor-pointer text-red-500 border rounded-sm border-red-400 hover:bg-black hover:border-transparent bg-transparent hover:text-white transition-colors transition-border duration-300 text-xs sm:text-sm">
+                        <Button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            addToCartHandler({
+                              productId: product._id,
+                              price: product.discountPrice!,
+                              name: product.name,
+                              photo: product.photos[0].url,
+                              stock: product.stock,
+                              quantity: 1,
+                            });
+                          }}
+                          className="w-full cursor-pointer text-red-500 border rounded-sm border-red-400 hover:bg-black hover:border-transparent bg-transparent hover:text-white transition-colors transition-border duration-300 text-xs sm:text-sm"
+                        >
                           <ShoppingCart className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                           ADD TO CART
                         </Button>

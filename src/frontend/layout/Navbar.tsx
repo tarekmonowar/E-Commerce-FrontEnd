@@ -20,6 +20,7 @@ import type { RootState } from "@/redux/store";
 import { useLogoutMutation } from "@/redux/api/authApi";
 import { toast } from "react-toastify";
 import { clearUser } from "@/redux/reducer/userReducer";
+import type { CartReducerInitialState } from "../types/types";
 // import { useCart } from "../../context/CartContext";
 
 const Navbar = () => {
@@ -31,6 +32,10 @@ const Navbar = () => {
   const quickContactRef = useRef<HTMLDivElement | null>(null);
 
   const user = useSelector((state: RootState) => state.userReducer.user);
+  const { cartItems } = useSelector(
+    (state: { cartReducer: CartReducerInitialState }) => state.cartReducer,
+  );
+
   const [logOut] = useLogoutMutation();
 
   const navigate = useNavigate();
@@ -177,14 +182,15 @@ const Navbar = () => {
                 >
                   <div className="relative mb-1">
                     <FiShoppingCart
-                      size={24}
+                      size={25}
                       className="text-[#666666] group-hover:text-[#2C742F] transition-colors"
                     />
-                    {/* {getCartCount() > 0 && (
-                      <span className="absolute -top-1 -right-1 bg-[#FF8A00] text-white w-5 h-5 rounded-full text-xs flex items-center justify-center">
-                        {getCartCount()}
+
+                    {cartItems.length > 0 && (
+                      <span className="absolute -top-2 -right-2 bg-[#FF8A00] text-white w-5 h-5 rounded-full text-xs flex items-center justify-center">
+                        {cartItems.length}
                       </span>
-                    )} */}
+                    )}
                   </div>
                   <span className="text-[10px] xl:text-[13px]">Cart</span>
                 </button>

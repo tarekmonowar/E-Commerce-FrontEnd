@@ -56,12 +56,23 @@ const AuthForm = () => {
         setIsLoading(false);
       } else {
         setIsLoading(false);
-        const message =
-          (res.error as any).data.message ||
-          (res.error as any).data.errorSource?.[0].message ||
-          (res.error as any).message ||
-          res.data?.message ||
-          "Registration failed.";
+        const errorData = (res.error as any)?.data;
+        let message = "Registration failed.";
+        if (errorData?.errorSource?.length > 0) {
+          const seen = new Set();
+          message = errorData.errorSource
+            .filter((e: any) => {
+              if (seen.has(e.path)) return false;
+              seen.add(e.path);
+              return true;
+            })
+            .map((e: any) => `${e.path}: ${e.message}`)
+            .join(", ");
+        } else if (errorData?.message) {
+          message = errorData.message;
+        } else if ((res.error as any)?.message) {
+          message = (res.error as any).message;
+        }
         toast.error(message);
       }
     } catch (error: any) {

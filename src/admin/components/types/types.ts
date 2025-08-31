@@ -20,3 +20,10 @@ export interface FormErrors {
   description?: string;
   photos?: string;
 }
+
+export interface ICoupon {
+  _id: string;
+  code: string;
+  amount: number;
+  isActive?: boolean;
+}
