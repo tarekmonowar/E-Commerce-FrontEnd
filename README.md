@@ -41,11 +41,10 @@ https://github.com/tarekmonowar/E-Commerce-BackEnd
 
 ![Admin Dashboard](/public//images//Admin-dashboard1.png)
 
-_(Replace the above paths with your actual screenshot files.)_
-
 ## Technologies Used
 
 - **Frontend:** React.js,tailwind Css , Shadcn Ui
+- **Backend:** Node.js, Express.js, MongoDB , Rest Api , AWS
 - **State Management:** Redux / RTK Query
 - **Routing:** React Router
 - **Authentication:** OAuth2 & JWT Tokens
