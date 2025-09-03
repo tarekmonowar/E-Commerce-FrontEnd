@@ -58,3 +58,7 @@ https://github.com/tarekmonowar/E-Commerce-BackEnd
    ```bash
    git clone https://github.com/tarekmonowar/E-Commerce-FrontEnd.git
    ```
+
+# Contact Info
+
+tarekmonowar353@gmail.com
