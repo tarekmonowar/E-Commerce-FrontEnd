@@ -1,69 +1,61 @@
-# React + TypeScript + Vite
+# TM_ECommerce - Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+TM_ECommerce is a modern, responsive e-commerce frontend application built to
+provide a seamless shopping experience. Users can browse products, filter by
+categories, add items to the cart, place orders, and track their purchases. The
+admin dashboard allows for comprehensive management of users, products, orders,
+and payments with real-time statistics.
 
-Currently, two official plugins are available:
+# Live Link :
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+https://tm-ecommerce.vercel.app/
 
-## Expanding the ESLint configuration
+# BackEnd Repository:
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+https://github.com/tarekmonowar/E-Commerce-BackEnd
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Features
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+### User Features
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- Browse and filter products
+- Add products to cart
+- User authentication with OAuth and token-based system
+- Place orders and pay securely via Stripe
+- Track order status and delivery
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Admin Features
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- Add, edit, or delete products
+- Block or manage users
+- View all orders, payments, and users
+- Access real-time statistics and analytics
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Screenshots
+
+### 1. User Product Page
+
+![User Product Page](/public/images/ecommerce.png)
+
+### 2. Admin Dashboard
+
+![Admin Dashboard](/public//images//Admin-dashboard1.png)
+
+_(Replace the above paths with your actual screenshot files.)_
+
+## Technologies Used
+
+- **Frontend:** React.js,tailwind Css , Shadcn Ui
+- **State Management:** Redux / RTK Query
+- **Routing:** React Router
+- **Authentication:** OAuth2 & JWT Tokens
+- **Payment Integration:** Stripe API
+- **Styling:** Tailwind CSS / Shadcn Ui
+- **Charts & Stats:** Chart.js / Recharts
+
+## Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/tarekmonowar/E-Commerce-FrontEnd.git
+   ```
