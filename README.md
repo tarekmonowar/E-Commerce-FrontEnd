@@ -18,11 +18,13 @@ https://github.com/tarekmonowar/E-Commerce-BackEnd
 
 ### User Features
 
+- User registration and login
+- OAuth2 authentication and JWT token-based sessions
 - Browse and filter products
 - Add products to cart
-- User authentication with OAuth and token-based system
 - Place orders and pay securely via Stripe
 - Track order status and delivery
+- Write Reviews
 
 ### Admin Features
 
