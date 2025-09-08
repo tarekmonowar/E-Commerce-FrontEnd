@@ -11,6 +11,7 @@ import {
   Truck,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 const banners = [
   {
@@ -33,7 +34,7 @@ const banners = [
     subtitle: "Fashion & Electronics",
     description:
       "Explore our vast collection of fashion, electronics, and lifestyle products. Everything you need in one place.",
-    bgGradient: "from-pink-700 via-red-500 to-orange-500",
+    bgGradient: "from-slate-700 via-gray-800 to-cyan-900",
     image: "./banner/bannerImage2.avif",
     features: ["Latest Fashion", "Electronics", "Home & Living"],
     bottomBadges: [
@@ -63,7 +64,7 @@ const banners = [
     subtitle: "Your Shopping Destination",
     description:
       "Experience seamless online shopping with our user-friendly platform. Quality products, competitive prices.",
-    bgGradient: "from-violet-600 via-purple-600 to-indigo-700",
+    bgGradient: "from-emerald-800 via-green-900 to-slate-900",
     image: "./banner/bannerimage5.png",
     features: ["Easy Shopping", "Secure Payment", "24/7 Support"],
     bottomBadges: [
@@ -102,40 +103,9 @@ const HeroBanner = () => {
   }, [instanceRef]);
 
   return (
-    <div className="relative w-full h-[300px] sm:h-[400px] md:h-[450px] lg:h-[500px]  rounded-lg shadow-2xl">
-      {/* left Side Banner */}
-      <div className="absolute hidden xl:flex left-[calc((100%-1280px)/2-12%)] sm:left-[calc((100%-1280px)/2-18%)] md:left-[calc((100%-1280px)/2-20%)] top-0 w-[15%] sm:w-[18%] md:w-[20%] h-full z-20 items-center justify-center ml-4">
-        <div
-          className={`w-full h-[70%] sm:h-[75%] md:h-[80%] bg-gradient-to-br ${
-            banners[getPrevIndex()].bgGradient
-          } cursor-pointer transition-all duration-700 hover:scale-105 shadow-lg hover:shadow-2xl rounded-l-2xl group`}
-        >
-          <div className="relative w-full h-full p-2 sm:p-3 md:p-4 lg:p-6 text-white overflow-hidden rounded-l-2xl">
-            <div className="absolute inset-0 bg-black/30 rounded-l-2xl"></div>
-            <div className="relative z-10 h-full flex flex-col justify-between">
-              <div>
-                <h3 className="text-xs sm:text-sm md:text-base lg:text-lg font-bold mb-1 sm:mb-2 truncate">
-                  {banners[getPrevIndex()].title.split(" ")[0]}
-                </h3>
-                <p className="text-xs sm:text-sm opacity-90 truncate">
-                  {banners[getPrevIndex()].subtitle}
-                </p>
-              </div>
-
-              <div className="flex-1 flex items-center justify-center my-2 sm:my-3 md:my-4">
-                <img
-                  src={banners[getPrevIndex()].image}
-                  alt={banners[getPrevIndex()].title}
-                  className="w-full h-16 sm:h-20 md:h-24 lg:h-32 object-cover rounded-lg opacity-80 group-hover:opacity-100 transition-opacity duration-300"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
+    <div className="relative w-full h-[300px] sm:h-[400px] md:h-[450px] lg:h-[500px]  rounded-lg shadow-2xl ">
       {/* Right Side Banner */}
-      <div className="absolute hidden xl:flex right-[calc((100%-1280px)/2-12%)] sm:right-[calc((100%-1280px)/2-18%)] md:right-[calc((100%-1280px)/2-20%)] top-0 w-[15%] sm:w-[18%] md:w-[20%] h-full z-20 items-center justify-center mr-4 ">
+      <div className="absolute hidden [@media(min-width:1880px)]:flex right-[calc((100%-1280px)/2-12%)] sm:right-[calc((100%-1280px)/2-18%)] md:right-[calc((100%-1280px)/2-20%)] top-0 w-[20%] h-full z-20 items-center justify-center mr-4 ">
         <div
           className={`w-full h-[70%] sm:h-[75%] md:h-[80%] bg-gradient-to-br ${
             banners[getNextIndex()].bgGradient
@@ -164,6 +134,36 @@ const HeroBanner = () => {
         </div>
       </div>
 
+      {/* left Side Banner */}
+      <div className="absolute hidden [@media(min-width:1880px)]:flex  left-[calc((100%-1280px)/2-12%)] sm:left-[calc((100%-1280px)/2-18%)] md:left-[calc((100%-1280px)/2-20%)] top-0 w-[15%] sm:w-[18%] md:w-[20%] h-full z-20 items-center justify-center ml-4">
+        <div
+          className={`w-full h-[70%] sm:h-[75%] md:h-[80%] bg-gradient-to-br ${
+            banners[getPrevIndex()].bgGradient
+          } cursor-pointer transition-all duration-700 hover:scale-105 shadow-lg hover:shadow-2xl rounded-l-2xl group`}
+        >
+          <div className="relative w-full h-full p-2 sm:p-3 md:p-4 lg:p-6 text-white overflow-hidden rounded-l-2xl">
+            <div className="absolute inset-0 bg-black/30 rounded-l-2xl"></div>
+            <div className="relative z-10 h-full flex flex-col justify-between">
+              <div>
+                <h3 className="text-xs sm:text-sm md:text-base lg:text-lg font-bold mb-1 sm:mb-2 truncate">
+                  {banners[getPrevIndex()].title.split(" ")[0]}
+                </h3>
+                <p className="text-xs sm:text-sm opacity-90 truncate">
+                  {banners[getPrevIndex()].subtitle}
+                </p>
+              </div>
+
+              <div className="flex-1 flex items-center justify-center my-2 sm:my-3 md:my-4">
+                <img
+                  src={banners[getPrevIndex()].image}
+                  alt={banners[getPrevIndex()].title}
+                  className="w-full h-16 sm:h-20 md:h-24 lg:h-32 object-cover rounded-lg opacity-80 group-hover:opacity-100 transition-opacity duration-300"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       {/* Main Banner div */}
       <div
         ref={sliderRef}
@@ -209,16 +209,20 @@ const HeroBanner = () => {
                   ))}
                 </div>
                 {/* Buttons */}
-                <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
-                  <Button className="bg-white text-gray-900 hover:bg-gray-100 px-6 py-2.5 sm:px-8 sm:py-3 text-sm sm:text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer">
-                    Shop Now
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="border-white text-white hover:bg-white cursor-pointer px-6 py-2.5 sm:px-8 sm:py-3 text-sm sm:text-lg font-semibold backdrop-blur-sm transition-all duration-300 hover:scale-105"
-                  >
-                    View Products
-                  </Button>
+                <div className="flex flex-row space-y-2 sm:space-y-0 gap-2 sm:gap-0 sm:space-x-4 pb-2">
+                  <Link to="/all-products">
+                    <Button className="bg-white text-gray-900 hover:bg-gray-100 px-6 py-2.5 sm:px-8 sm:py-3 text-sm sm:text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer">
+                      Shop Now
+                    </Button>
+                  </Link>
+                  <Link to="/all-products">
+                    <Button
+                      variant="outline"
+                      className="border-white text-white hover:bg-white cursor-pointer px-6 py-2.5 sm:px-8 sm:py-3 text-sm sm:text-lg font-semibold backdrop-blur-sm transition-all duration-300 hover:scale-105"
+                    >
+                      View Products
+                    </Button>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -268,12 +272,12 @@ const HeroBanner = () => {
       </button>
 
       {/* Dots */}
-      <div className="absolute bottom-4 sm:bottom-6 left-1/2 transform -translate-x-1/2 flex space-x-2 sm:space-x-3 z-10">
+      <div className="hidden xl:flex absolute bottom-4 sm:bottom-6 left-1/2 transform -translate-x-1/2  space-x-2 sm:space-x-3 z-10">
         {banners.map((_, idx) => (
           <button
             key={idx}
             onClick={() => instanceRef.current?.moveToIdx(idx)}
-            className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all duration-300 ${
+            className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all duration-300 cursor-pointer ${
               idx === currentSlide
                 ? "bg-white scale-125"
                 : "bg-white/50 hover:bg-white/80"

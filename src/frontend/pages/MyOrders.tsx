@@ -6,9 +6,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { useMyOrdersQuery } from "@/redux/api/orderApi";
 import { Printer } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import type { CustomError, Order } from "../types/types";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -100,8 +107,13 @@ const handlePrint = (order: Order) => {
 
 // 📦 Main Component
 export default function Orders() {
-  const { data, isLoading, isError, error } = useMyOrdersQuery();
+  const [currentPage, setCurrentPage] = useState(1);
+  const { data, isLoading, isError, error } = useMyOrdersQuery({
+    page: currentPage,
+    limit: 15,
+  });
 
+  // console.log(data);
   useEffect(() => {
     if (isError) {
       const err = error as CustomError;
@@ -110,6 +122,7 @@ export default function Orders() {
   }, [isError, error]);
 
   const orders = data?.data as Order[];
+  const totalPage = data?.meta?.totalPage || 1;
 
   return (
     <section className="bg-gray-100 min-h-[60vh] pt-5">
@@ -139,107 +152,152 @@ export default function Orders() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {isLoading
-              ? Array.from({ length: 15 }).map((_, index) => (
-                  <TableRow key={index} className="border-b border-gray-300">
-                    <TableCell>
-                      <Skeleton className="h-7 w-52 rounded" />
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <Skeleton className="h-7 w-6 rounded mx-auto" />
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <Skeleton className="h-7 w-8 rounded mx-auto" />
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <Skeleton className="h-7 w-16 rounded mx-auto" />
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <Skeleton className="h-7 w-23 rounded mx-auto" />
-                    </TableCell>
-                    <TableCell className="flex gap-2 justify-center">
-                      <Skeleton className="h-7 w-21 rounded" />
-                      <Skeleton className="h-7 w-21 rounded" />
-                      <Skeleton className="h-7 w-8 rounded" />
-                    </TableCell>
-                  </TableRow>
-                ))
-              : orders?.map((order) => (
-                  <TableRow
-                    key={order._id}
-                    className="border-b border-gray-300 hover:bg-gray-100 transition"
-                  >
-                    <TableCell>{order._id}</TableCell>
-                    <TableCell className="text-center">
-                      {order.orderItems.length}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      ${order.discount}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      ${order.total}
-                    </TableCell>
+            {isLoading ? (
+              Array.from({ length: 15 }).map((_, index) => (
+                <TableRow key={index} className="border-b border-gray-300">
+                  <TableCell>
+                    <Skeleton className="h-7 w-52 rounded" />
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <Skeleton className="h-7 w-6 rounded mx-auto" />
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <Skeleton className="h-7 w-8 rounded mx-auto" />
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <Skeleton className="h-7 w-16 rounded mx-auto" />
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <Skeleton className="h-7 w-23 rounded mx-auto" />
+                  </TableCell>
+                  <TableCell className="flex gap-2 justify-center">
+                    <Skeleton className="h-7 w-21 rounded" />
+                    <Skeleton className="h-7 w-21 rounded" />
+                    <Skeleton className="h-7 w-8 rounded" />
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : orders && orders.length > 0 ? (
+              orders?.map((order) => (
+                <TableRow
+                  key={order._id}
+                  className="border-b border-gray-300 hover:bg-gray-100 transition"
+                >
+                  <TableCell>{order._id}</TableCell>
+                  <TableCell className="text-center">
+                    {order.orderItems.length}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    ${order.discount}
+                  </TableCell>
+                  <TableCell className="text-center">${order.total}</TableCell>
 
-                    <TableCell className="text-center">
-                      {(() => {
-                        switch (order.status) {
-                          case "Delivered":
-                            return (
-                              <span className="font-bold text-[16px]  text-[rgb(47,0,255)]">
-                                Delivered
-                              </span>
-                            );
-                          case "Cancelled":
-                            return (
-                              <span className="font-bold text-[16px] text-red-500">
-                                Cancelled
-                              </span>
-                            );
-                          case "Shipped":
-                            return (
-                              <span className="text-green-800 text-[16px]  font-bold">
-                                Shipped
-                              </span>
-                            );
-                          case "Processing":
-                            return (
-                              <span className="font-bold text-[16px] text-[#b17a32]">
-                                Processing
-                              </span>
-                            );
-                          default:
-                            return (
-                              <span className="text-gray-500 text-[16px]">
-                                {order.status}
-                              </span>
-                            );
-                        }
-                      })()}
-                    </TableCell>
+                  <TableCell className="text-center">
+                    {(() => {
+                      switch (order.status) {
+                        case "Delivered":
+                          return (
+                            <span className="font-bold text-[16px]  text-[rgb(47,0,255)]">
+                              Delivered
+                            </span>
+                          );
+                        case "Cancelled":
+                          return (
+                            <span className="font-bold text-[16px] text-red-500">
+                              Cancelled
+                            </span>
+                          );
+                        case "Shipped":
+                          return (
+                            <span className="text-green-800 text-[16px]  font-bold">
+                              Shipped
+                            </span>
+                          );
+                        case "Processing":
+                          return (
+                            <span className="font-bold text-[16px] text-[#b17a32]">
+                              Processing
+                            </span>
+                          );
+                        default:
+                          return (
+                            <span className="text-gray-500 text-[16px]">
+                              {order.status}
+                            </span>
+                          );
+                      }
+                    })()}
+                  </TableCell>
 
-                    <TableCell className="flex gap-2 justify-center">
-                      <Link
-                        to={`/order-details/${order._id}`}
-                        className="px-4 py-1 rounded bg-black text-white hover:bg-white hover:text-black border border-black transition cursor-pointer"
-                      >
-                        Details
-                      </Link>
-                      <button
-                        // onClick={() => handleDetails(order)}
-                        className="px-4 py-1 rounded bg-white text-black hover:bg-gray-200 font-semibold border  transition cursor-pointer"
-                      >
-                        Invoice
-                      </button>
-                      <button
-                        onClick={() => handlePrint(order)}
-                        className="px-2 py-1 rounded bg-black text-white hover:bg-white hover:text-black border border-black transition cursor-pointer"
-                      >
-                        <Printer size={17} />
-                      </button>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                  <TableCell className="flex gap-2 justify-center">
+                    <Link
+                      to={`/order-details/${order._id}`}
+                      className="px-4 py-1 rounded bg-black text-white hover:bg-white hover:text-black border border-black transition cursor-pointer"
+                    >
+                      Details
+                    </Link>
+                    <button
+                      // onClick={() => handleDetails(order)}
+                      className="px-4 py-1 rounded bg-white text-black hover:bg-gray-200 font-semibold border  transition cursor-pointer"
+                    >
+                      Invoice
+                    </button>
+                    <button
+                      onClick={() => handlePrint(order)}
+                      className="px-2 py-1 rounded bg-black text-white hover:bg-white hover:text-black border border-black transition cursor-pointer"
+                    >
+                      <Printer size={17} />
+                    </button>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              // 🚨 No Orders Found
+              <TableRow>
+                <TableCell
+                  colSpan={6}
+                  className="text-center py-10 text-gray-500  font-semibold text-lg"
+                >
+                  You have not placed any orders yet.
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
+          {totalPage > 1 && (
+            <div className="my-7">
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      onClick={() => setCurrentPage((prev) => prev - 1)}
+                      className={
+                        currentPage === 1
+                          ? " opacity-50 bg-gray-300 rounded mr-2 py-[5px] pr-4 border-none pointer-events-none"
+                          : "cursor-pointer bg-[#236027] hover:bg-[#2C742F] text-white rounded mr-2 py-1 pr-4 border-none"
+                      }
+                    />
+                  </PaginationItem>
+                  <PaginationItem className="px-4">
+                    <span className="text-red-800 font-bold">
+                      {currentPage}
+                    </span>{" "}
+                    <span className="px-2">Of</span> {totalPage}
+                  </PaginationItem>
+
+                  <PaginationItem>
+                    <PaginationNext
+                      onClick={() => setCurrentPage((prev) => prev + 1)}
+                      className={
+                        currentPage === totalPage
+                          ? "pointer-events-none opacity-50 bg-gray-300 rounded ml-2 py-1 pl-4 border-none"
+                          : "cursor-pointer bg-[#236027] hover:bg-[#2C742F] text-white rounded ml-2 py-1 pl-4 border-none"
+                      }
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          )}
         </Table>
       </div>
     </section>

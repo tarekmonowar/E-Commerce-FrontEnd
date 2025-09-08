@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { BiSearch } from "react-icons/bi";
 import {
   FiMenu,
   FiMessageCircle,
@@ -21,6 +20,7 @@ import { useLogoutMutation } from "@/redux/api/authApi";
 import { toast } from "react-toastify";
 import { clearUser } from "@/redux/reducer/userReducer";
 import type { CartReducerInitialState } from "../types/types";
+import SearchBar from "./SearchBar";
 // import { useCart } from "../../context/CartContext";
 
 const Navbar = () => {
@@ -141,16 +141,7 @@ const Navbar = () => {
                     >
                       All Categories
                     </button>
-                    <div className="flex-1 relative">
-                      <input
-                        type="text"
-                        placeholder="Search for items..."
-                        className="w-full py-2 px-4 border text-[11px] sm:text-[16px] border-gray-300  rounded-r-full rounded-l-full md:rounded-l-none focus:outline-none focus:border-[#2C742F]"
-                      />
-                      <button className="absolute right-0 top-0 h-full px-6 bg-[#2C742F] hover:bg-[#236027] rounded-r-full  transition-colors cursor-pointer">
-                        <BiSearch className="text-white text-xl" />
-                      </button>
-                    </div>
+                    <SearchBar />
                   </div>
                 </div>
               </div>
@@ -251,6 +242,7 @@ const Navbar = () => {
         <MobileSidebar
           isOpen={isMobileMenuOpen}
           onClose={() => setIsMobileMenuOpen(false)}
+          handleLogout={handleLogout}
         />
       </header>
 

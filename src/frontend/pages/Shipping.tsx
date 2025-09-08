@@ -100,12 +100,25 @@ export default function Shipping() {
       });
       toast.success("Shipping address updated & payment session started!");
     } catch (error: any) {
-      console.error(error);
-      toast.error(
-        error?.message ||
-          error?.data?.message ||
-          "Something went wrong during checkout",
-      );
+      const errorData = error;
+      console.error(errorData);
+
+      let message = "Registration failed.";
+      if (errorData?.data.errorSource?.length > 0) {
+        const seen = new Set();
+        message = errorData.data.errorSource
+          .filter((e: any) => {
+            if (seen.has(e.path)) return false;
+            seen.add(e.path);
+            return true;
+          })
+          .map((e: any) => `${e.message}`)
+          .join(", ");
+      } else {
+        message = error?.message || error?.data?.message;
+      }
+
+      toast.error(message);
     } finally {
       setLoading(false);
     }

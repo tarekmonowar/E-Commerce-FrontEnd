@@ -144,6 +144,20 @@ const AuthForm = () => {
   const handleGoogleLogin = () => {
     window.location.href = `${import.meta.env.VITE_SERVER}/api/v1/auth/google`;
   };
+  //Github
+  const handleGithubLogin = () => {
+    toast.info("Github login coming soon...");
+  };
+  //facebook
+  const handlefacebookLogin = () => {
+    toast.info("Facebook login coming soon...");
+  };
+
+  //logIn demo account
+
+  const fillDemoAccount = (email: string, password: string) => {
+    setSigninData({ email, password });
+  };
 
   return (
     <div className="min-h-[90vh] xl:min-h-[85vh] bg-gray-50 flex items-center justify-center font-montserrat p-5 pt-[113px] md:pt-0">
@@ -275,7 +289,7 @@ const AuthForm = () => {
             onSubmit={handleSignInSubmit}
             className="bg-white flex flex-col justify-between px-1 md:px-12 h-full text-center py-8"
           >
-            <div>
+            <div className="px-1  md:px-0">
               <h1 className="font-bold text-2xl mb-6">Sign In</h1>
               <div className="flex space-x-3 mb-6 justify-center">
                 <button
@@ -285,11 +299,17 @@ const AuthForm = () => {
                 >
                   <FaGoogle size={24} />
                 </button>
-                <button className="border border-gray-300 bg-gray-300 rounded-full w-10 h-10 xl:w-12 xl:h-12 cursor-pointer flex items-center justify-center hover:bg-gray-200 transition-colors hover:scale-105">
+                <button
+                  onClick={handleGithubLogin}
+                  className="border border-gray-300 bg-gray-300 rounded-full w-10 h-10 xl:w-12 xl:h-12 cursor-pointer flex items-center justify-center hover:bg-gray-200 transition-colors hover:scale-105"
+                >
                   <FaGithub size={24} />
                 </button>
 
-                <button className="border border-gray-300 rounded-full cursor-pointer bg-[#4267B2] text-white w-10 h-10 xl:w-12 xl:h-12 flex items-center justify-center hover:bg-[#4267b2e7] transition-colors hover:scale-105">
+                <button
+                  onClick={handlefacebookLogin}
+                  className="border border-gray-300 rounded-full cursor-pointer bg-[#4267B2] text-white w-10 h-10 xl:w-12 xl:h-12 flex items-center justify-center hover:bg-[#4267b2e7] transition-colors hover:scale-105"
+                >
                   <FaFacebook size={24} />
                 </button>
               </div>
@@ -428,6 +448,29 @@ const AuthForm = () => {
               >
                 Register
               </button>
+              <div className="absolute bottom-6 text-sm space-y-1 p-2 w-full text-left pl-10 text-black">
+                <p className="text-center">
+                  Try the platform with demo accounts
+                </p>
+                <div className="flex gap-3 justify-center mt-2">
+                  <button
+                    onClick={() =>
+                      fillDemoAccount("tarekmonowar353@gmail.com", "12345Tm@")
+                    }
+                    className="rounded border border-white bg-transparent text-black text-xs md:text-base font-semibold py-1 px-4 tracking-wider uppercase transition-transform duration-75 hover:scale-95 focus:outline-none cursor-pointer"
+                  >
+                    Admin
+                  </button>
+                  <button
+                    onClick={() =>
+                      fillDemoAccount("tarekmonowar2332@gmail.com", "123456Ph@")
+                    }
+                    className="rounded border border-white bg-transparent text-black text-xs md:text-base font-semibold py-1 px-4 tracking-wider uppercase transition-transform duration-75 hover:scale-95 focus:outline-none cursor-pointer"
+                  >
+                    User
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>

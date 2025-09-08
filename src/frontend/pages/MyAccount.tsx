@@ -42,7 +42,7 @@ const menuItems: MenuItem[] = [
   { id: "delete", label: "Delete Account", icon: Trash2 },
 ];
 
-export const MyAccount = () => {
+export default function MyAccount() {
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.userReducer.user);
   const [updateUserImage] = useUpdateUserImageMutation();
@@ -201,4 +201,4 @@ export const MyAccount = () => {
       </div>
     </div>
   );
-};
+}

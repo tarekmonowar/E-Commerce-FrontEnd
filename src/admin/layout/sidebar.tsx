@@ -1,6 +1,7 @@
 import { forwardRef } from "react";
 import { NavLink } from "react-router-dom";
-import logoLight from "@/assets/admin/tmlogo.png";
+import logoLight from "/logo.png";
+
 import { navbarLinks } from "@/admin/components/constants";
 import { cn } from "@/lib/utils";
 

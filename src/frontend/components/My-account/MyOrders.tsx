@@ -7,9 +7,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import type { CustomError, Order } from "@/frontend/types/types";
 import { useMyOrdersQuery } from "@/redux/api/orderApi";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 // 🖨️ Print Function
@@ -98,8 +105,12 @@ const handlePrint = (order: Order) => {
 
 // 📦 Main Component
 export default function Orders() {
-  const { data, isLoading, isError, error } = useMyOrdersQuery();
-
+  const [currentPage, setCurrentPage] = useState(1);
+  const { data, isLoading, isError, error } = useMyOrdersQuery({
+    page: currentPage,
+    limit: 10,
+  });
+  console.log(data);
   useEffect(() => {
     if (isError) {
       const err = error as CustomError;
@@ -108,6 +119,8 @@ export default function Orders() {
   }, [isError, error]);
 
   const orders = data?.data as Order[];
+  const totalPage = data?.meta?.totalPage || 1;
+
   return (
     <section className="rounded-sm border-none shadow bg-white">
       <div className="p-6 max-w-7xl mx-auto rounded shadow-sm">
@@ -216,6 +229,42 @@ export default function Orders() {
                   </TableRow>
                 ))}
           </TableBody>
+
+          {totalPage > 1 && (
+            <div className="my-7">
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      onClick={() => setCurrentPage((prev) => prev - 1)}
+                      className={
+                        currentPage === 1
+                          ? " opacity-50 bg-gray-300 rounded mr-2 py-[5px] pr-4 border-none pointer-events-none"
+                          : "cursor-pointer bg-[#236027] hover:bg-[#2C742F] text-white rounded mr-2 py-1 pr-4 border-none"
+                      }
+                    />
+                  </PaginationItem>
+                  <PaginationItem className="px-4">
+                    <span className="text-red-800 font-bold">
+                      {currentPage}
+                    </span>{" "}
+                    <span className="px-2">Of</span> {totalPage}
+                  </PaginationItem>
+
+                  <PaginationItem>
+                    <PaginationNext
+                      onClick={() => setCurrentPage((prev) => prev + 1)}
+                      className={
+                        currentPage === totalPage
+                          ? "pointer-events-none opacity-50 bg-gray-300 rounded ml-2 py-1 pl-4 border-none"
+                          : "cursor-pointer bg-[#236027] hover:bg-[#2C742F] text-white rounded ml-2 py-1 pl-4 border-none"
+                      }
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          )}
         </Table>
       </div>
     </section>

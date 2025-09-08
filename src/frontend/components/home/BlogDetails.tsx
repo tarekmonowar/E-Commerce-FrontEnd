@@ -16,14 +16,14 @@ const BlogDetail = () => {
 
   if (!post) {
     return (
-      <div className="mt-20 flex items-center justify-center">
+      <div className="my-20 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-black mb-4">
             Blog Post Not Found !
           </h1>
           <Button
             onClick={() => navigate(-1)}
-            className="rounded-sm bg-red-700 hover:bg-red-800 cursor-pointer text-white"
+            className="rounded-sm bg-red-800 hover:bg-red-700 cursor-pointer text-white"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Home
@@ -67,7 +67,7 @@ const BlogDetail = () => {
       </div>
 
       {/* Content Section */}
-      <div className="container max-w-[1300px] mx-auto px-4 py-12">
+      <div className="container max-w-7xl mx-auto px-4 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2">

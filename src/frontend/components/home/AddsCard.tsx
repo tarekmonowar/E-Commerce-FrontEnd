@@ -231,7 +231,7 @@ const AddsCard = () => {
         `}
       </style>
       <div className="bg-[#f6f7f9] py-5">
-        <div className="container max-w-7xl mx-auto px-4 py-12 ">
+        <div className="container max-w-7xl mx-auto px-[17px] py-12 ">
           <div className="grid grid-cols-1 md:grid-cols-5 lg:grid-cols-6 gap-5">
             {/* Left slider */}
             <div className="md:col-span-3 lg:col-span-4 relative">

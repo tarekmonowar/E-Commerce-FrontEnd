@@ -26,6 +26,11 @@ import ProductsSkelton from "../utils/ProductsSkelton";
 import { addToCart } from "@/redux/reducer/cartReducer";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
+import {
+  addToWishlist,
+  removeFromWishlist,
+  type WishlistState,
+} from "@/redux/reducer/wishlistReducer";
 
 const RelatedProducts = ({ category }: { category: string }) => {
   const [hoveredProduct, setHoveredProduct] = useState<string | null>(null);
@@ -45,6 +50,10 @@ const RelatedProducts = ({ category }: { category: string }) => {
 
   const { cartItems } = useSelector(
     (state: { cartReducer: CartReducerInitialState }) => state.cartReducer,
+  );
+
+  const { wishlistItems } = useSelector(
+    (state: { wishlistReducer: WishlistState }) => state.wishlistReducer,
   );
   const { data, isLoading } = useGetAllProductsQuery({
     category,
@@ -70,6 +79,20 @@ const RelatedProducts = ({ category }: { category: string }) => {
     dispatch(addToCart(cartItem));
     toast.success("Item added to cart!");
   };
+
+  //*Wishlist Handler
+  const addToWishlistHandler = (productId: string) => {
+    const alreadyInWishlist = wishlistItems.includes(productId);
+
+    if (alreadyInWishlist) {
+      dispatch(removeFromWishlist(productId));
+      toast.info("Removed from wishlist");
+    } else {
+      dispatch(addToWishlist(productId));
+      toast.success("Added to wishlist!");
+    }
+  };
+
   return (
     <>
       <div className="bg-[#f6f7f9] py-6 pb-10 ">
@@ -128,7 +151,7 @@ const RelatedProducts = ({ category }: { category: string }) => {
                         {/* Product Image */}
                         <div
                           className="relative h-40 sm:h-48 overflow-hidden cursor-pointer"
-                          onClick={() => navigate(`/product/${product._id}`)}
+                          onClick={() => handleOpenModal(product)}
                         >
                           <img
                             src={
@@ -152,7 +175,7 @@ const RelatedProducts = ({ category }: { category: string }) => {
                               className="rounded-full w-8 h-8 sm:w-10 sm:h-10 p-0 text-black bg-white font-bold hover:bg-red-500 hover:text-white cursor-pointer flex items-center justify-center"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                handleOpenModal(product);
+                                navigate(`/product/${product._id}`);
                               }}
                             >
                               <Eye className="w-3 h-3 sm:w-5 sm:h-5" />
@@ -161,10 +184,14 @@ const RelatedProducts = ({ category }: { category: string }) => {
                             <Button
                               size="sm"
                               variant="secondary"
-                              className="rounded-full w-8 h-8 sm:w-10 sm:h-10 p-0 text-black bg-white font-bold hover:bg-red-500 hover:text-white cursor-pointer"
+                              className={`rounded-full w-8 h-8 sm:w-10 sm:h-10 p-0 font-bold  cursor-pointer ${
+                                wishlistItems.includes(product._id)
+                                  ? "bg-gray-800 hover:bg-red-600 text-white"
+                                  : "bg-white text-black hover:bg-red-500 hover:text-white"
+                              } `}
                               onClick={(e) => {
                                 e.stopPropagation();
-                                navigate(`/cart`);
+                                addToWishlistHandler(product._id);
                               }}
                             >
                               <Heart className="w-3 h-3 sm:w-4 sm:h-4 " />

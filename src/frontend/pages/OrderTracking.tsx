@@ -17,7 +17,10 @@ const OrderTracking = () => {
   useEffect(() => {
     if (isError && apiError) {
       const err = apiError as CustomError;
-      const message = err?.data?.message || "Something went wrong";
+      let message = err?.data?.message || "Something went wrong";
+      if (message === "Invalid MongoDB Object ID") {
+        message = "The order ID you entered is incorrect.";
+      }
       toast.error(message);
       setError(message);
     }

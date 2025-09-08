@@ -12,7 +12,7 @@ const Blogs = () => {
 
   return (
     <section className="bg-[#f6f7f9] py-16">
-      <div className="container max-w-[1330px] mx-auto px-4">
+      <div className="container max-w-7xl mx-auto px-4">
         <div className="text-left mb-12">
           <h2 className="text-3xl md:text-3xl text-gray-900 mb-4">
             From The Blog

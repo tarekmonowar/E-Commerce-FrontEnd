@@ -5,51 +5,10 @@ import { Footer } from "@/admin/layout/footer";
 import { topProducts } from "../components/constants";
 import FourItems from "../components/FourItems";
 import Overview from "../components/Overview";
-// import ProjectDetails from "./components/ProjectDetails";
 
 const DashboardPage = () => {
-  // //for toastify message
-
-  // const toastId = "contact-form-toast"; // unique id
-  // const location = useLocation();
-
-  // useEffect(() => {
-  //     if (!toast.isActive(toastId)) {
-  //         toast.info("Open for testing; in a real project, it will be protected for admins/owners only.", {
-  //             toastId: toastId,
-  //             autoClose: 15000,
-  //             hideProgressBar: false,
-  //             closeOnClick: true,
-  //             pauseOnHover: true,
-  //             draggable: true,
-  //             theme: "colored",
-  //         });
-  //     }
-  //     // Cleanup: Dismiss toast when route changes
-  //     return () => {
-  //         toast.dismiss(toastId);
-  //     };
-  // }, [location]);
-
-  //for project details components
-  // const [showDetails, setShowDetails] = useState(false);
-
-  // useEffect(() => {
-  //     const hasClosed = sessionStorage.getItem("hasClosedProjectDetails");
-
-  //     if (!hasClosed) {
-  //         setShowDetails(true);
-  //     }
-  // }, []);
-
-  // const handleCloseDetails = () => {
-  //     setShowDetails(false);
-  //     sessionStorage.setItem("hasClosedProjectDetails", "true");
-  // };
-
   return (
     <div className="scroll-hidden flex flex-col gap-y-4">
-      {/* {showDetails && <ProjectDetails onClose={handleCloseDetails} />} */}
       <h1 className="title">Dashboard</h1>
 
       {/* top 4 cards section */}
@@ -59,6 +18,8 @@ const DashboardPage = () => {
       {/* overview and recent sales section */}
 
       <Overview />
+
+      {/* top 10 products */}
       <div className="card">
         <div className="card-header">
           <p className="card-title">Top Products</p>

@@ -9,6 +9,9 @@ import { productApi } from "./api/productApi";
 import { cartReducer } from "./reducer/cartReducer";
 import { orderApi } from "./api/orderApi";
 import { couponApi } from "./api/couponApi";
+import { wishlistReducer } from "./reducer/wishlistReducer";
+import { wishlistApi } from "./api/wishlistApi";
+import { supportApi } from "./api/supportApi";
 
 export const server = import.meta.env.VITE_SERVER;
 
@@ -39,6 +42,18 @@ const LocalStorageMiddleware = (store: any) => (next: any) => (action: any) => {
     localStorage.setItem("cart", JSON.stringify(cartState));
   }
 
+  // Save wishlist to localStorage
+  const wishlistActions = [
+    "wishlistReducer/addToWishlist",
+    "wishlistReducer/removeFromWishlist",
+    "wishlistReducer/resetWishlist",
+  ];
+
+  if (wishlistActions.includes(action.type)) {
+    const wishlistState = store.getState().wishlistReducer;
+    localStorage.setItem("wishlist", JSON.stringify(wishlistState));
+  }
+
   return result;
 };
 
@@ -50,8 +65,11 @@ const store = configureStore({
     [productApi.reducerPath]: productApi.reducer,
     [orderApi.reducerPath]: orderApi.reducer,
     [couponApi.reducerPath]: couponApi.reducer,
+    [wishlistApi.reducerPath]: wishlistApi.reducer,
+    [supportApi.reducerPath]: supportApi.reducer,
     [userReducer.name]: userReducer.reducer,
     [cartReducer.name]: cartReducer.reducer,
+    [wishlistReducer.name]: wishlistReducer.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat([
@@ -61,6 +79,8 @@ const store = configureStore({
       productApi.middleware,
       orderApi.middleware,
       couponApi.middleware,
+      wishlistApi.middleware,
+      supportApi.middleware,
       LocalStorageMiddleware,
     ]),
 });

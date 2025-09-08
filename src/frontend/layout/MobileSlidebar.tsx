@@ -1,57 +1,65 @@
-import { StepForward } from "lucide-react";
+import type { RootState } from "@/redux/store";
 import { useState } from "react";
-import {
-  FaAppleAlt,
-  FaBreadSlice,
-  FaCarrot,
-  FaChevronDown,
-  FaEgg,
-  FaLeaf,
-  FaMugHot,
-} from "react-icons/fa";
-import { GiHoneypot } from "react-icons/gi";
+import { FaChevronDown, FaRegPlusSquare } from "react-icons/fa";
 import { IoClose } from "react-icons/io5";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
 type MobileSidebarProps = {
   isOpen: boolean;
   onClose: () => void;
+  handleLogout: () => void;
 };
 
 const categories = [
   {
-    name: "Fresh Vegetables",
-    icon: <FaCarrot className="text-[#2B7A0B]" />,
+    name: "Fashion",
+    icon: FaRegPlusSquare,
+    color: "text-green-600",
   },
   {
-    name: "Fresh Fruits",
-    icon: <FaAppleAlt className="text-[#FF6B6B]" />,
+    name: "Groceries",
+    icon: FaRegPlusSquare,
   },
   {
-    name: "Bakery",
-    icon: <FaBreadSlice className="text-[#FFB23F]" />,
+    name: "Beauty",
+    icon: FaRegPlusSquare,
+    color: "text-red-800",
   },
   {
-    name: "Dairy & Eggs",
-    icon: <FaEgg className="text-[#4A90E2]" />,
+    name: "Footwear",
+    icon: FaRegPlusSquare,
+    color: "text-blue-800",
   },
   {
-    name: "Honey",
-    icon: <GiHoneypot className="text-[#D4A373]" />,
+    name: "Electronics",
+    icon: FaRegPlusSquare,
+    color: "text-amber-600",
+  },
+
+  {
+    name: "Jewellery",
+    icon: FaRegPlusSquare,
+    color: "text-[#2C742F]",
   },
   {
-    name: "Tea & Coffee",
-    icon: <FaMugHot className="text-[#3A5A40]" />,
-  },
-  {
-    name: "Herbs",
-    icon: <FaLeaf className="text-[#2D6A4F]" />,
+    name: "Gifts",
+    icon: FaRegPlusSquare,
+    color: "text-blue-700",
   },
 ];
-
-const MobileSidebar = ({ isOpen, onClose }: MobileSidebarProps) => {
+const MobileSidebar = ({
+  isOpen,
+  onClose,
+  handleLogout,
+}: MobileSidebarProps) => {
+  const user = useSelector((state: RootState) => state.userReducer.user);
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
 
+  const handleLogoutClick = () => {
+    handleLogout();
+    onClose();
+  };
   return (
     <div
       className={`fixed top-0 left-0 h-full w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out z-50 ${
@@ -61,12 +69,33 @@ const MobileSidebar = ({ isOpen, onClose }: MobileSidebarProps) => {
       <div className="flex flex-col h-full">
         {/* Header */}
         <div className="flex justify-between items-center p-4 border-b border-gray-300">
-          <h2 className="text-xl font-bold text-[#2C742F]">TMonowar</h2>
+          {user ? (
+            <>
+              <div className="h-10 w-10">
+                {" "}
+                {user.picture ? (
+                  <img
+                    src={user.picture.url}
+                    className="w-full h-full rounded-full object-cover"
+                  />
+                ) : (
+                  <img
+                    src="/default-avatar.png"
+                    alt="Default Avatar"
+                    className="w-full h-full object-cover rounded-full"
+                  />
+                )}
+              </div>
+              <p className="text-sm">{user.name}</p>
+            </>
+          ) : (
+            <h2 className="text-xl font-bold text-[#2C742F]">E-Commerce</h2>
+          )}
           <button
             onClick={onClose}
             className="p-2 bg-[#2C742F] rounded-full text-white cursor-pointer hover:bg-[#236027]"
           >
-            <IoClose className="text-2xl" />
+            <IoClose className="text-xl" />
           </button>
         </div>
 
@@ -97,49 +126,114 @@ const MobileSidebar = ({ isOpen, onClose }: MobileSidebarProps) => {
               >
                 <div className="space-y-1 pl-2 pb-3">
                   {categories.map((category, index) => (
-                    <button
+                    <div
                       key={index}
-                      className="flex items-center gap-3 w-full py-1 px-3 text-gray-600 hover:bg-gray-200 rounded-lg transition-colors cursor-pointer"
+                      className="relative px-4 py-[4px] text-gray-700 hover:bg-gray-100 group"
                     >
-                      <span className="text-xl font-bold text-[#0f4712]">
-                        <StepForward className="text-[#61a827]" />
-                      </span>
-                      <span className="text-md font-medium text-[#236027]">
-                        {category.name}
-                      </span>
-                    </button>
+                      <Link
+                        to={`/all-products?category=${category.name.toLowerCase()}`}
+                        onClick={onClose}
+                      >
+                        <div className="flex items-center gap-3">
+                          <category.icon
+                            size={14}
+                            className={`${category.color} group-hover:scale-110 transition-transform`}
+                          />
+                          <span className="font-medium  transition-colors">
+                            {category.name}
+                          </span>
+                        </div>
+                      </Link>
+                    </div>
                   ))}
                 </div>
               </div>
             </div>
 
             {/* Other Links */}
-            <div className=" mt-2 ">
-              <Link
-                to="#"
-                className="block px-4 py-3 text-gray-700 hover:bg-gray-200 hover:text-[#236027]"
-              >
-                About Us
-              </Link>
-              <Link
-                to="#"
-                className="block px-4 py-3 text-gray-700 hover:bg-gray-200 hover:text-[#236027]"
-              >
-                Order Tracking
-              </Link>
-              <Link
-                to="#"
-                className="block px-4 py-3 text-gray-700 hover:bg-gray-200 hover:text-[#236027]"
-              >
-                Contact
-              </Link>
-              <Link
-                to="#"
-                className="block px-4 py-3 text-gray-700 hover:bg-gray-200 hover:text-[#236027]"
-              >
-                FAQ
-              </Link>
-            </div>
+            {user ? (
+              <div className="mt-3 font-semibold">
+                <Link
+                  to="/"
+                  className="block px-4 py-3 text-gray-700 hover:bg-gray-200 hover:text-[#236027]"
+                  onClick={onClose}
+                >
+                  Home
+                </Link>
+                <Link
+                  className="block px-4 py-3 text-gray-700 hover:bg-gray-200 hover:text-[#236027]"
+                  to="/my-account"
+                  onClick={onClose}
+                >
+                  My Account
+                </Link>
+                <Link
+                  className="block px-4 py-3 text-gray-700 hover:bg-gray-200 hover:text-[#236027]"
+                  to="/my-orders"
+                  onClick={onClose}
+                >
+                  My Orders
+                </Link>
+                <Link
+                  className="block px-4 py-3 text-gray-700 hover:bg-gray-200 hover:text-[#236027]"
+                  to="/wishlist"
+                  onClick={onClose}
+                >
+                  Wishlist
+                </Link>
+                <button
+                  className="block px-4 py-3 w-full text-left cursor-pointer text-red-400 hover:bg-gray-200 hover:text-red-700"
+                  onClick={handleLogoutClick}
+                >
+                  Log Out
+                </button>
+              </div>
+            ) : (
+              <div className=" mt-2 font-semibold ">
+                <Link
+                  to="/"
+                  className="block px-4 py-3 text-gray-700 hover:bg-gray-200 hover:text-[#236027]"
+                  onClick={onClose}
+                >
+                  Home
+                </Link>
+                <Link
+                  to="/sign-in"
+                  className="block px-4 py-3 text-gray-700 hover:bg-gray-200 hover:text-[#236027]"
+                  onClick={onClose}
+                >
+                  Sign In
+                </Link>
+                <Link
+                  to="/footerLink/contact"
+                  className="block px-4 py-3 text-gray-700 hover:bg-gray-200 hover:text-[#236027]"
+                  onClick={onClose}
+                >
+                  Contact
+                </Link>
+                <Link
+                  to="/footerLink/about-us"
+                  className="block px-4 py-3 text-gray-700 hover:bg-gray-200 hover:text-[#236027]"
+                  onClick={onClose}
+                >
+                  About Us
+                </Link>
+                <Link
+                  to="/wishlist"
+                  className="block px-4 py-3 text-gray-700 hover:bg-gray-200 hover:text-[#236027]"
+                  onClick={onClose}
+                >
+                  Wishlist
+                </Link>
+                <Link
+                  to="/footerLink/faqs"
+                  className="block px-4 py-3 text-gray-700 hover:bg-gray-200 hover:text-[#236027]"
+                  onClick={onClose}
+                >
+                  FAQ
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </div>

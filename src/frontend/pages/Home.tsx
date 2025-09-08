@@ -13,8 +13,8 @@ import PopularProducts from "../components/home/products/Popularproducts";
 
 export default function Home() {
   return (
-    <section className=" bg-gradient-to-b from-neutral-50 to-white pt-[113px] md:pt-0 min-h-screen">
-      <div className="container mx-auto px-4 max-w-7xl py-7 xl:py-12 ">
+    <section className=" bg-gradient-to-b from-neutral-50 to-white pt-[40px] md:pt-0 min-h-screen">
+      <div className="container mx-auto px-4 max-w-7xl  pb-5 md:py-5 xl:py-12 ">
         <HeroBanner />
         <CategorySection />
       </div>

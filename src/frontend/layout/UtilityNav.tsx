@@ -1,9 +1,11 @@
+import type { WishlistState } from "@/redux/reducer/wishlistReducer";
 import { ChevronsDown } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { BiCategory } from "react-icons/bi";
 import { BsHeadset } from "react-icons/bs";
 import { FaRegPlusSquare } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const categories = [
   {
@@ -36,11 +38,20 @@ const categories = [
     icon: FaRegPlusSquare,
     color: "text-[#2C742F]",
   },
+  {
+    name: "Gifts",
+    icon: FaRegPlusSquare,
+    color: "text-blue-700",
+  },
 ];
 
 const UtilityNav = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const allCategoriesRef = useRef<HTMLDivElement | null>(null);
+
+  const { wishlistItems } = useSelector(
+    (state: { wishlistReducer: WishlistState }) => state.wishlistReducer,
+  );
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -56,17 +67,19 @@ const UtilityNav = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
   return (
-    <div className=" bg-gray-50 border-b border-gray-200 relative hidden md:block">
+    <div className=" bg-gray-50 border-b border-gray-200 relative ">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between">
           {/* Browse Categories Button */}
-          <div className="relative " ref={allCategoriesRef}>
+          <div className="relative hidden md:block" ref={allCategoriesRef}>
             <button
               className="flex items-center gap-2 bg-[#2C742F] text-white px-6 py-3 rounded-[4px] hover:bg-primary-dark transition-colors cursor-pointer"
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             >
               <BiCategory className="text-xl" />
-              <span>All Categories</span>
+              <span>
+                <span className="hidden lg:inline">All</span> Categories
+              </span>
               <ChevronsDown
                 className={`transition-transform duration-200 ${
                   isDropdownOpen ? "rotate-180" : ""
@@ -89,7 +102,7 @@ const UtilityNav = () => {
                       >
                         <div className="flex items-center gap-3">
                           <category.icon
-                            size={22}
+                            size={14}
                             className={`${category.color} group-hover:scale-110 transition-transform`}
                           />
                           <span className="font-medium  transition-colors">
@@ -105,7 +118,7 @@ const UtilityNav = () => {
           </div>
 
           {/* Center Menu Items */}
-          <div className="flex items-center gap-8">
+          <div className="flex items-center gap-3 sm:gap-5 md:gap-8 px-3 text-sm lg:text-[16px]">
             <Link
               to="/all-products"
               className="relative inline-block py-3 text-neutral-dark transition-colors duration-300 
@@ -113,7 +126,7 @@ const UtilityNav = () => {
              after:bg-[#236027] after:origin-center after:scale-x-0
              after:transition-transform after:duration-300 hover:after:scale-x-100 ease-in-out"
             >
-              All Products
+              <span className="hidden lg:inline">All</span> Products
             </Link>
 
             <Link
@@ -123,7 +136,7 @@ const UtilityNav = () => {
              after:bg-[#236027] after:origin-center after:scale-x-0
              after:transition-transform after:duration-300 hover:after:scale-x-100 ease-in-out"
             >
-              My Accounts
+              <span className="hidden lg:inline">My</span> Accounts
             </Link>
             <Link
               to={"/order-tracking"}
@@ -132,37 +145,45 @@ const UtilityNav = () => {
              after:bg-[#236027] after:origin-center after:scale-x-0
              after:transition-transform after:duration-300 hover:after:scale-x-100 ease-in-out"
             >
-              Order Tracking
+              <span className="hidden lg:inline">Order</span> Tracking
             </Link>
             <Link
               to="/footerLink/contact"
-              className="relative inline-block py-3 text-neutral-dark transition-colors duration-300 
+              className="relative hidden [@media(min-width:399px)]:inline-block py-3 text-neutral-dark transition-colors duration-300 
              after:content-[''] after:absolute after:bottom-2 after:left-0 after:w-full after:h-[2px]
              after:bg-[#236027] after:origin-center after:scale-x-0
              after:transition-transform after:duration-300 hover:after:scale-x-100 ease-in-out"
             >
               Contact
             </Link>
-            <Link
-              to="/footerLink/faqs"
-              className="relative inline-block py-3 text-neutral-dark transition-colors duration-300 
+            <div className="relative">
+              <Link
+                to="/wishlist"
+                className="relative inline-block py-3 text-neutral-dark transition-colors duration-300 
              after:content-[''] after:absolute after:bottom-2 after:left-0 after:w-full after:h-[2px]
              after:bg-[#236027] after:origin-center after:scale-x-0
              after:transition-transform after:duration-300  hover:after:scale-x-100 ease-in-out"
-            >
-              FAQ
-            </Link>
+              >
+                Wishlist
+              </Link>
+              {wishlistItems.length > 0 && (
+                <span className="absolute top-0 -right-1 bg-[#2C742F] text-white w-5 h-5 rounded-full text-xs flex items-center justify-center">
+                  {wishlistItems.length}
+                </span>
+              )}
+            </div>
           </div>
 
           {/* Customer Support */}
-          <div className="flex items-center gap-2 text-neutral-dark">
-            <BsHeadset className="text-3xl font-bold text-[#2C742F]" />
+          <div className="items-center gap-2 md:gap-1 lg:gap-2  text-neutral-dark hidden [@media(min-width:520px)]:flex">
+            <BsHeadset className="text-2xl sm:text-xl lg:text-3xl font-bold text-[#2C742F]" />
             <div className="flex flex-col">
-              <span className="text-lg font-medium text-[#2C742F]">
-                +0996201872
+              <span className="text-sm sm:text-[12px] lg:text-lg font-medium text-[#2C742F]">
+                +099620187
               </span>
               <span className="text-xs text-neutral">
-                24 <span className="text-gray-400">/</span> 7 Customer support
+                24 <span className="text-gray-400">/</span> 7{" "}
+                <span className="hidden lg:inline ">Customer</span> support
               </span>
             </div>
           </div>

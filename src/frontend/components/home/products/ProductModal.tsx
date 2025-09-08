@@ -217,7 +217,6 @@ export default function ProductModal({
             </div>
 
             {/* Quantity Selector */}
-            {/* Quantity Selector */}
             <div className="flex items-center gap-4 mb-4">
               <label className="text-md font-medium">Quantity:</label>
               <div>
@@ -252,11 +251,11 @@ export default function ProductModal({
                     });
                   }}
                   variant="default"
-                  className="mr-4 rounded-sm text-white/80 hover:bg-white bg-black hover:text-black border cursor-pointer "
+                  className="mr-4 rounded-sm text-white/80 hover:bg-white bg-black hover:text-black border cursor-pointer transition-all duration-200 "
                 >
                   <ShoppingCart /> ADD TO CART
                 </Button>
-                <Button className="font-bold border text-black rounded-sm hover:bg-gray-300 cursor-pointer hidden sm:flex">
+                <Button className="font-bold border text-black rounded-sm hover:bg-gray-300 bg-gray-100 cursor-pointer hidden sm:flex transition-all duration-200">
                   <Heart className="w-4 h-4" />
                   Add to Wishlist
                 </Button>

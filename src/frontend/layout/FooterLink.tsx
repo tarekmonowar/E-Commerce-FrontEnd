@@ -29,7 +29,7 @@ const FooterLink = () => {
       {/* Content */}
       <div className="container max-w-7xl mx-auto px-4 pb-12 pt-7 ">
         <div className=" mx-auto ">
-          <Card className="shadow-lg pb-0 bg-[#236209]">
+          <Card className="shadow-lg pb-0 bg-gradient-to-r from-emerald-800 via-green-900 to-slate-900 border-none">
             <div className="pt-10 ">
               <div className="container mx-auto px-4 text-center">
                 <h1 className="text-4xl font-bold mb-4 text-white">
@@ -61,7 +61,7 @@ const FooterLink = () => {
                 .map((link) => (
                   <Card
                     key={link.id}
-                    className="hover:shadow-lg transition-shadow cursor-pointer bg-gray-200"
+                    className="hover:shadow-lg transition-shadow cursor-pointer bg-gray-200 border-none"
                   >
                     <CardContent className="p-6">
                       <h4 className="font-semibold text-black text-lg mb-2">
@@ -73,7 +73,7 @@ const FooterLink = () => {
                       </p>
                       <Link
                         to={`/footerLink/${link.id}`}
-                        className="inline-block mt-4 text-black  hover:underline text-sm font-medium"
+                        className="inline-block mt-4 text-red-900 hover:text-red-600 hover:font-semibold text-sm font-medium"
                       >
                         Learn More →
                       </Link>

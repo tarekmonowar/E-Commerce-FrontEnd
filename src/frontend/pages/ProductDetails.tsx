@@ -114,7 +114,7 @@ export default function ProductPage() {
                       <img
                         src={photo.url}
                         alt={`${product.name}-${index}`}
-                        className="w-full h-16 object-cover"
+                        className="w-full h-16 object-cover "
                       />
                     </div>
                   ))}

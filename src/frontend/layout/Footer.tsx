@@ -1,14 +1,41 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useSubscribeNewsletterMutation } from "@/redux/api/supportApi";
+import { useState } from "react";
 import { FaFacebook } from "react-icons/fa6";
 import { FiLinkedin, FiMail, FiMapPin } from "react-icons/fi";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const Footer = () => {
+  const [email, setEmail] = useState("");
+  const [subscribeNewsletter, { isLoading }] = useSubscribeNewsletterMutation();
+
+  const isValidEmail = (email: string) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!email || !isValidEmail(email)) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+
+    try {
+      await subscribeNewsletter({ email }).unwrap();
+      toast.success("Thanks for subscribing! Check your inbox for updates.");
+      setEmail("");
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Failed to subscribe. Try again.");
+    }
+  };
+
   return (
     <footer className="bg-[#F3F9F1] text-gray-800 pt-6 ">
-      <div className="max-w-7xl mx-auto px-4 ">
-        <div className="flex md:grid grid-cols-3 gap-8 ">
+      <div className="max-w-7xl mx-auto px-5 ">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
           {/* Contact Info */}
-          <div>
+          <div className="justify-self-start md:justify-self-center">
             <h3 className="text-lg font-semibold mb-4 text-[#2B7A0B]">
               Contact Us
             </h3>
@@ -53,7 +80,7 @@ const Footer = () => {
           </div>
 
           {/* Quick Links */}
-          <div>
+          <div className="justify-self-end md:justify-self-center ">
             <h3 className="font-semibold text-lg mb-4 text-[#2B7A0B]">
               Quick Links
             </h3>
@@ -102,7 +129,7 @@ const Footer = () => {
           </div>
 
           {/* Newsletter */}
-          <div>
+          <div className="col-span-2 md:col-span-1">
             <h3 className="text-lg font-semibold mb-4 text-[#2B7A0B]">
               Newsletter
             </h3>
@@ -113,10 +140,16 @@ const Footer = () => {
               <input
                 type="email"
                 placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-2.5 rounded-full bg-white border border-gray-200 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#2B7A0B] focus:border-transparent"
               />
-              <button className="w-full px-6 py-2.5 bg-[#2B7A0B] text-white rounded-full font-medium hover:bg-[#236209] transition-colors cursor-pointer">
-                Subscribe
+              <button
+                onClick={handleSubscribe}
+                disabled={isLoading}
+                className="w-full px-6 py-2.5 bg-[#2B7A0B] text-white rounded-full font-medium hover:bg-[#236209] transition-colors cursor-pointer"
+              >
+                {isLoading ? <>Subscribing...</> : "Subscribe"}
               </button>
             </form>
           </div>

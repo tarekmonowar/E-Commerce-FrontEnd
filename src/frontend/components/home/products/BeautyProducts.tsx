@@ -27,6 +27,11 @@ import type {
 import { toast } from "react-toastify";
 import ProductsSkelton from "../../utils/ProductsSkelton";
 import { addToCart } from "@/redux/reducer/cartReducer";
+import {
+  addToWishlist,
+  removeFromWishlist,
+  type WishlistState,
+} from "@/redux/reducer/wishlistReducer";
 import { useDispatch, useSelector } from "react-redux";
 
 const BeautyProducts = () => {
@@ -39,6 +44,10 @@ const BeautyProducts = () => {
 
   const { cartItems } = useSelector(
     (state: { cartReducer: CartReducerInitialState }) => state.cartReducer,
+  );
+
+  const { wishlistItems } = useSelector(
+    (state: { wishlistReducer: WishlistState }) => state.wishlistReducer,
   );
 
   const { data, isLoading, isError, error } = useGetAllProductsQuery({
@@ -80,6 +89,19 @@ const BeautyProducts = () => {
 
     dispatch(addToCart(cartItem));
     toast.success("Item added to cart!");
+  };
+
+  //*Wishlist Handler
+  const addToWishlistHandler = (productId: string) => {
+    const alreadyInWishlist = wishlistItems.includes(productId);
+
+    if (alreadyInWishlist) {
+      dispatch(removeFromWishlist(productId));
+      toast.info("Removed from wishlist");
+    } else {
+      dispatch(addToWishlist(productId));
+      toast.success("Added to wishlist!");
+    }
   };
 
   return (
@@ -124,9 +146,7 @@ const BeautyProducts = () => {
               className="[scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden mySwiper"
             >
               {/* Dummy spacer for large screens */}
-              <SwiperSlide className="!w-[calc((100%-1280px)/2)] !flex-shrink-0 hidden lg:!block" />
-              {/* Dummy spacer for mobile */}
-              <SwiperSlide className="!w-[10px] !flex-shrink-0 lg:!hidden" />
+              <SwiperSlide className="!w-[calc((100%-1280px)/2)] !flex-shrink-0 hidden lg:!block ml-2" />
 
               {/* Product cards */}
               {isLoading ? (
@@ -151,7 +171,7 @@ const BeautyProducts = () => {
                         {/* Product Image */}
                         <div
                           className="relative h-40 sm:h-48 overflow-hidden cursor-pointer"
-                          onClick={() => navigate(`/product/${product._id}`)}
+                          onClick={() => handleOpenModal(product)}
                         >
                           <img
                             src={
@@ -175,7 +195,7 @@ const BeautyProducts = () => {
                               className="rounded-full w-8 h-8 sm:w-10 sm:h-10 p-0 text-black bg-white font-bold hover:bg-red-500 hover:text-white cursor-pointer flex items-center justify-center"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                handleOpenModal(product);
+                                navigate(`/product/${product._id}`);
                               }}
                             >
                               <Eye className="w-3 h-3 sm:w-5 sm:h-5" />
@@ -184,10 +204,14 @@ const BeautyProducts = () => {
                             <Button
                               size="sm"
                               variant="secondary"
-                              className="rounded-full w-8 h-8 sm:w-10 sm:h-10 p-0 text-black bg-white font-bold hover:bg-red-500 hover:text-white cursor-pointer"
+                              className={`rounded-full w-8 h-8 sm:w-10 sm:h-10 p-0 font-bold  cursor-pointer ${
+                                wishlistItems.includes(product._id)
+                                  ? "bg-gray-800 hover:bg-red-600 text-white"
+                                  : "bg-white text-black hover:bg-red-500 hover:text-white"
+                              } `}
                               onClick={(e) => {
                                 e.stopPropagation();
-                                navigate(`/cart`);
+                                addToWishlistHandler(product._id);
                               }}
                             >
                               <Heart className="w-3 h-3 sm:w-4 sm:h-4 " />

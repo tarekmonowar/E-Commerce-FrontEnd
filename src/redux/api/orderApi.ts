@@ -23,10 +23,17 @@ export const orderApi = createApi({
       invalidatesTags: ["orders"],
     }),
 
-    myOrders: builder.query<ApiResponse<Order[]>, void>({
-      query: () => `/my`,
+    myOrders: builder.query<
+      ApiResponse<Order[]>,
+      Record<string, string | number>
+    >({
+      query: (params) => ({
+        url: "/my",
+        params,
+      }),
       providesTags: ["orders"],
     }),
+
     allOrders: builder.query<ApiResponse<Order[]>, void>({
       query: () => `/all`,
       providesTags: ["orders"],

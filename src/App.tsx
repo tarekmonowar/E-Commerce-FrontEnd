@@ -1,51 +1,53 @@
-import { useEffect } from "react";
+import { lazy, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { ThemeProvider } from "./contexts/theme-provider";
+import { getUser } from "./redux/api/userApi";
+import { clearUser, setUser } from "./redux/reducer/userReducer";
+import type { RootState } from "./redux/store";
 
 // Import Toastify
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 //Public routes import
-import Home from "./frontend/pages/Home";
-import { getUser } from "./redux/api/userApi";
-
-//Authenticate routes import
-
-//admin routes import
-import EditProduct from "./admin/components/EditProduct";
 import Layout from "./admin/layout/Layout";
-import AddProduct from "./admin/pages/AddProduct";
-import AllUsers from "./admin/pages/All-users";
-import Analytics_Charts from "./admin/pages/Analytics_Charts";
-import Coupon from "./admin/pages/Coupon";
-import Dashboard from "./admin/pages/Dashboard";
-import Orders from "./admin/pages/Orders";
-import Products from "./admin/pages/Products";
-import RevenueChart from "./admin/pages/RevenueChart";
-import Settings from "./admin/pages/Settings";
-import Stock from "./admin/pages/Stock";
-import TopCustomers from "./admin/pages/TopCustomers";
-import VerifiedAdmin from "./admin/pages/VerifiedAdmin";
-import ResetPassword from "./frontend/components/account/ResetPassword";
-import SignIn from "./frontend/components/account/SignIn";
-import BlogDetail from "./frontend/components/home/BlogDetails";
-import FooterLink from "./frontend/layout/FooterLink";
 import MainLayout from "./frontend/layout/MainLayout";
-import AllProducts from "./frontend/pages/AllProducts";
-import CartDetails from "./frontend/pages/CartDetails";
-import { MyAccount } from "./frontend/pages/MyAccount";
-import MyOrders from "./frontend/pages/MyOrders";
-import OrderTracking from "./frontend/pages/OrderTracking";
-import ProductDetails from "./frontend/pages/ProductDetails";
-import Shipping from "./frontend/pages/Shipping";
-import Wishlisht from "./frontend/pages/Wishlisht";
 import ProtectedRoute from "./lib/ProtectedRoute";
-import { clearUser, setUser } from "./redux/reducer/userReducer";
-import type { RootState } from "./redux/store";
-import CheckOut from "./frontend/pages/CheckOut";
-import OrderDetails from "./frontend/pages/orderDetails";
+
+//Front end lazy imports
+const Home = lazy(() => import("./frontend/pages/Home"));
+const BlogDetail = lazy(() => import("./frontend/components/home/BlogDetails"));
+const FooterLink = lazy(() => import("./frontend/layout/FooterLink"));
+const ProductDetails = lazy(() => import("./frontend/pages/ProductDetails"));
+const AllProducts = lazy(() => import("./frontend/pages/AllProducts"));
+const CartDetails = lazy(() => import("./frontend/pages/CartDetails"));
+const Wishlist = lazy(() => import("./frontend/pages/Wishlist"));
+const OrderTracking = lazy(() => import("./frontend/pages/OrderTracking"));
+const SignIn = lazy(() => import("./frontend/components/account/SignIn"));
+const MyAccount = lazy(() => import("./frontend/pages/MyAccount"));
+const MyOrders = lazy(() => import("./frontend/pages/MyOrders"));
+const Shipping = lazy(() => import("./frontend/pages/Shipping"));
+const CheckOut = lazy(() => import("./frontend/pages/CheckOut"));
+const OrderDetails = lazy(() => import("./frontend/pages/orderDetails"));
+const ResetPassword = lazy(
+  () => import("./frontend/components/account/ResetPassword"),
+);
+
+//admin routes lazy import
+const Dashboard = lazy(() => import("./admin/pages/Dashboard"));
+const Orders = lazy(() => import("./admin/pages/Orders"));
+const Products = lazy(() => import("./admin/pages/Products"));
+const EditProduct = lazy(() => import("./admin/components/EditProduct"));
+const AddProduct = lazy(() => import("./admin/pages/AddProduct"));
+const Coupon = lazy(() => import("./admin/pages/Coupon"));
+const Stock = lazy(() => import("./admin/pages/Stock"));
+const Analytics_Charts = lazy(() => import("./admin/pages/Analytics_Charts"));
+const RevenueChart = lazy(() => import("./admin/pages/RevenueChart"));
+const VerifiedAdmin = lazy(() => import("./admin/pages/VerifiedAdmin"));
+const AllUsers = lazy(() => import("./admin/pages/All-users"));
+const TopCustomers = lazy(() => import("./admin/pages/TopCustomers"));
+const Settings = lazy(() => import("./admin/pages/Settings"));
 
 export default function App() {
   const Dispatch = useDispatch();
@@ -123,6 +125,14 @@ export default function App() {
           }
         />
         <Route
+          path="/wishlist"
+          element={
+            <MainLayout>
+              <Wishlist />
+            </MainLayout>
+          }
+        />
+        <Route
           path="/order-tracking"
           element={
             <MainLayout>
@@ -170,14 +180,6 @@ export default function App() {
             element={
               <MainLayout>
                 <MyOrders />
-              </MainLayout>
-            }
-          />
-          <Route
-            path="/wishlist"
-            element={
-              <MainLayout>
-                <Wishlisht />
               </MainLayout>
             }
           />

@@ -9,8 +9,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
-
-import profileImg from "/logo.png";
+import type { RootState } from "@/redux/store";
+import { useDispatch, useSelector } from "react-redux";
+import { useLogoutMutation } from "@/redux/api/authApi";
+import { clearUser } from "@/redux/reducer/userReducer";
 
 type HeaderProps = {
   collapsed: boolean;
@@ -20,6 +22,22 @@ type HeaderProps = {
 export const Header = ({ collapsed, setCollapsed }: HeaderProps) => {
   const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const user = useSelector((state: RootState) => state.userReducer.user);
+  const [logOut] = useLogoutMutation();
+
+  const handleLogout = async () => {
+    try {
+      await logOut();
+      localStorage.removeItem("user");
+      toast.success("Logout Successful");
+      dispatch(clearUser());
+      navigate("/sign-in");
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
 
   return (
     <header className="relative z-10 flex h-[60px] items-center justify-between bg-white px-4 shadow-md transition-colors dark:bg-slate-900">
@@ -60,11 +78,7 @@ export const Header = ({ collapsed, setCollapsed }: HeaderProps) => {
         </button>
         <button
           className="btn-ghost cursor-pointer"
-          onClick={() =>
-            toast("🦄  Working....On Realtime Chat App!", {
-              position: "top-right",
-            })
-          }
+          onClick={() => toast("🦄  Working....On Realtime Chat App!")}
         >
           {/* <Bell size={20} /> */}
           <MessageSquareCode size={27} />
@@ -72,20 +86,36 @@ export const Header = ({ collapsed, setCollapsed }: HeaderProps) => {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button className="size-9 mr-2 overflow-hidden rounded-full cursor-pointer hover:opacity-80 transition-opacity">
-              <img
-                src={profileImg}
-                alt="profile"
-                className="size-full object-cover"
-              />
+              {user?.picture ? (
+                <img
+                  src={user.picture.url}
+                  className="w-full h-full rounded-full object-cover"
+                />
+              ) : (
+                <img
+                  src="/default-avatar.png"
+                  alt="Default Avatar"
+                  className="w-full h-full object-cover rounded-full"
+                />
+              )}
             </button>
           </DropdownMenuTrigger>
 
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent
+            align="end"
+            className="border-gray-400 px-0 rounded-sm"
+          >
             <DropdownMenuItem
-              className="cursor-pointer bg-white hover:bg-slate-300 dark:bg-slate-900 dark:hover:bg-slate-700 font-bold text-[17px] justify-center "
+              className="cursor-pointer border-b rounded-none border-gray-500  hover:bg-slate-300 dark:bg-slate-900 dark:hover:bg-slate-700 font-bold text-[17px] justify-center "
               onClick={() => navigate("/")}
             >
               Home
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="cursor-pointer  hover:bg-slate-300 rounded-none dark:bg-slate-900 dark:hover:bg-slate-700 font-bold text-[17px] justify-center "
+              onClick={handleLogout}
+            >
+              Log out
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
