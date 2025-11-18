@@ -1,3 +1,4 @@
+import { AIChatMessenger } from "./AiMessenger/AIMessenger";
 import Footer from "./Footer";
 import Navbar from "./Navbar";
 import TopFooter from "./TopFooter";
@@ -12,6 +13,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
     <main className="min-h-screen flex flex-col font-custom bg-white">
       <Navbar />
       <section className="flex-grow ">{children}</section>
+      <AIChatMessenger />
       <TopFooter />
       <Footer />
     </main>
