@@ -36,7 +36,7 @@ export function AIChatMessenger() {
     try {
       setIsTyping(true);
 
-      const res = await fetch("http://localhost:7000/api/v1/ai/chat", {
+      const res = await fetch(`${import.meta.env.VITE_SERVER}/api/v1/ai/chat`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
