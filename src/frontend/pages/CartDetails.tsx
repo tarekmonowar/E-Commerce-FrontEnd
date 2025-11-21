@@ -23,6 +23,10 @@ const CartDetails = () => {
 
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    scrollTo(0, 0);
+  }, []);
+
   const [couponCode, setCouponCode] = useState<string>("");
   const [isValidCouponCode, setIsValidCouponCode] = useState<boolean>(false);
 
@@ -194,6 +198,7 @@ const CartDetails = () => {
                   - ${discount}
                 </em>
               </p>
+
               <div className="my-2 border-t" />
               <p className="flex items-center justify-between text-lg">
                 <b className="font-semibold">Total</b>
@@ -209,12 +214,18 @@ const CartDetails = () => {
                 onChange={(e) => setCouponCode(e.target.value)}
                 className="w-full rounded-sm  bg-gray-200 px-4 py-3 border-none text-sm outline-none "
               />
-
+              {!couponCode && (
+                <p className="flex items-center gap-2 text-sm text-gray-600 pl-1">
+                  Use <span className="text-green-700 font-bold">NEW20</span>
+                  to get <span className="text-red-700 font-bold">$20</span>
+                  discount !
+                </p>
+              )}
               {couponCode &&
                 (isValidCouponCode ? (
-                  <span className="flex items-center gap-1 text-sm text-emerald-600 ml-2">
+                  <span className="flex items-center gap-1 text-sm text-green-800 ml-2">
                     ${discount} off using the
-                    <code className="rounded px-1.5 py-0.5 font-mono text-emerald-700">
+                    <code className="rounded px-1.5 py-0.5 font-bold text-green-800">
                       "{couponCode}"
                     </code>
                   </span>

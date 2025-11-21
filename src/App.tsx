@@ -244,7 +244,7 @@ export default function App() {
         <Route path="*" element={<h1>Not Found</h1>} />
       </Routes>
       <ToastContainer
-        position="top-center"
+        position="bottom-center"
         autoClose={3000}
         stacked
         hideProgressBar

@@ -118,6 +118,10 @@ export default function Orders() {
     }
   }, [isError, error]);
 
+  const handleInvoice = () => {
+    toast.warn("Invoice cannot available on free card payments!");
+  };
+
   const orders = data?.data as Order[];
   const totalPage = data?.meta?.totalPage || 1;
 
@@ -220,7 +224,7 @@ export default function Orders() {
                         Print
                       </button>
                       <button
-                        // onClick={() => handleDetails(order)}
+                        onClick={() => handleInvoice()}
                         className="px-4 py-1 rounded bg-white text-black hover:bg-gray-200 font-semibold border  transition cursor-pointer"
                       >
                         Invoice

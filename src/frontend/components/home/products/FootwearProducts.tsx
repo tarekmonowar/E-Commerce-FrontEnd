@@ -7,24 +7,25 @@ import {
   ShoppingCart,
   Star,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { HiArrowLongRight } from "react-icons/hi2";
+import { Link, useNavigate } from "react-router-dom";
 // @ts-expect-error TS2307: Cannot find module
 import "swiper/css";
+// @ts-expect-error TS2307: Cannot find module
+import "swiper/css/free-mode";
+import { FreeMode } from "swiper/modules";
+import { Swiper, SwiperSlide, type SwiperClass } from "swiper/react";
+import ProductModal from "./ProductModal";
+import { useGetAllProductsQuery } from "@/redux/api/productApi";
 import type {
   CartItem,
   CartReducerInitialState,
   CustomError,
   Product,
 } from "@/frontend/types/types";
-import { useGetAllProductsQuery } from "@/redux/api/productApi";
 import { toast } from "react-toastify";
-// @ts-expect-error TS2307: Cannot find module
-import "swiper/css/free-mode";
-import { FreeMode } from "swiper/modules";
-import { Swiper, SwiperSlide, type SwiperClass } from "swiper/react";
 import ProductsSkelton from "../../utils/ProductsSkelton";
-import ProductModal from "./ProductModal";
 import { addToCart } from "@/redux/reducer/cartReducer";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -33,20 +34,7 @@ import {
   type WishlistState,
 } from "@/redux/reducer/wishlistReducer";
 
-const AllCategories = [
-  "all",
-  "fashion",
-  "electronics",
-  "bags",
-  "footwear",
-  "groceries",
-  "beauty",
-  "gifts",
-  "jewellery",
-];
-
-const PopularProducts = () => {
-  const [activeCategory, setActiveCategory] = useState("all");
+const FootwearProducts = () => {
   const [hoveredProduct, setHoveredProduct] = useState<string | null>(null);
   const [swiperInstance, setSwiperInstance] = useState<SwiperClass | null>(
     null,
@@ -61,19 +49,10 @@ const PopularProducts = () => {
   const { wishlistItems } = useSelector(
     (state: { wishlistReducer: WishlistState }) => state.wishlistReducer,
   );
-  const params = useMemo(() => {
-    const p: Record<string, string | number> = {
-      sort: "-ratings -numOfReviews",
-    };
-
-    if (activeCategory !== "all") {
-      p.category = activeCategory;
-    }
-
-    return p;
-  }, [activeCategory]);
-
-  const { data, isLoading, isError, error } = useGetAllProductsQuery(params);
+  const { data, isLoading, isError, error } = useGetAllProductsQuery({
+    category: "footwear",
+    sort: "createdAt",
+  });
 
   const products = data?.data as Product[];
 
@@ -88,7 +67,6 @@ const PopularProducts = () => {
     setSelectedProduct(product);
     setModalOpen(true);
   };
-
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -128,39 +106,28 @@ const PopularProducts = () => {
     <>
       <div className="bg-[#f6f7f9] py-6 ">
         <div>
-          <div className="max-w-7xl mx-auto mb-6 xl:mb-10 px-5 lg:px-4">
-            <h2 className="text-xl sm:text-2xl xl:text-3xl font-bold text-gray-900 mb-2">
-              Popular Products
-            </h2>
-            <p className="text-sm sm:text-base  text-gray-600">
-              Do not miss the current offers until the end of{" "}
-              <span className="text-[#2C742F] font-bold">
-                {new Date().toLocaleString("en-US", { month: "long" })} !
-              </span>
-            </p>
-          </div>
-          {/* Category Tabs */}
-          <div className="px-5 lg:px-4 max-w-7xl mx-auto mb-6 xl:mb-10 flex flex-wrap gap-2 xl:gap-4 overflow-x-auto scrollbar-hide">
-            {AllCategories.map((category) => (
-              <button
-                key={category}
-                onClick={() => setActiveCategory(category)}
-                className={`px-3 sm:px-4 xl:px-5 py-2 xl:py-2 rounded-[4px] mb-1 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap cursor-pointer ${
-                  activeCategory === category
-                    ? "bg-[#236027] text-[#ffca2c]"
-                    : "bg-white [box-shadow:0px_2px_8px_0px_rgba(99,99,99,0.2)] text-gray-700  hover:font-bold"
-                }`}
+          <div className="flex justify-between max-w-7xl mx-auto mb-5 xl:mb-8 px-5 lg:px-4">
+            <div>
+              <h2 className="text-xl sm:text-2xl xl:text-3xl font-bold text-gray-900 mb-2">
+                Footwears
+              </h2>
+              <p className="text-sm sm:text-base text-gray-600">
+                Step into comfort and style with footwear designed for everyday
+                wear.
+              </p>
+            </div>
+            <div>
+              <Link
+                to={`/all-products?category=footwear`}
+                className="flex items-center gap-1 text-md bg-gray-200 py-1 px-2 rounded-[3px] cursor-pointer hover:bg-gray-300 transition-colors"
               >
-                {category.toUpperCase()}
-              </button>
-            ))}
+                View All <HiArrowLongRight className="w-5 h-5" />
+              </Link>
+            </div>
           </div>
 
           {/* Products Slider */}
-          <div
-            className="w-full overflow-x-auto relative"
-            key={`${activeCategory}-${products?.map((p) => p._id).join(",")}`}
-          >
+          <div className="w-full overflow-x-auto relative">
             <button
               onClick={() => swiperInstance?.slidePrev()}
               className="absolute left-7 xl:left-[calc((100%-1200px)/2)] top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg rounded-full p-2 hover:bg-red-600 hover:text-white cursor-pointer transition-colors block"
@@ -169,10 +136,6 @@ const PopularProducts = () => {
             </button>
 
             <Swiper
-              key={`${activeCategory}-${products?.map((p) => p._id).join(",")}`}
-              observer={true}
-              observeParents={true}
-              observeSlideChildren={true}
               onSwiper={setSwiperInstance}
               freeMode={true}
               modules={[FreeMode]}
@@ -295,11 +258,8 @@ const PopularProducts = () => {
                               }`}
                             />
                           ))}
-                          <span className="text-xs font-semibold text-gray-800 ml-1">
+                          <span className="text-xs text-gray-500 ml-1">
                             {product.ratings}
-                          </span>
-                          <span className="text-xs text-gray-500">
-                            ({product.numOfReviews})
                           </span>
                         </div>
 
@@ -326,7 +286,7 @@ const PopularProducts = () => {
                               quantity: 1,
                             });
                           }}
-                          className="w-full cursor-pointer text-red-500 border rounded-sm border-red-400 hover:bg-black hover:border-transparent bg-transparent hover:text-white transition-colors transition-border duration-300 text-xs sm:text-sm"
+                          className="w-full cursor-pointer text-black  rounded-sm border-[1px] border-black hover:bg-black hover:border-transparent bg-transparent hover:text-white transition-colors transition-border duration-300 text-xs sm:text-sm"
                         >
                           <ShoppingCart className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                           ADD TO CART
@@ -360,4 +320,4 @@ const PopularProducts = () => {
   );
 };
 
-export default PopularProducts;
+export default FootwearProducts;

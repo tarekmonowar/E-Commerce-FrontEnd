@@ -35,6 +35,10 @@ const AuthForm = () => {
     }
   }, [searchParams]);
 
+  useEffect(() => {
+    scrollTo(0, 0);
+  }, []);
+
   const [register] = useRegisterMutation();
   const [login] = useLoginMutation();
 

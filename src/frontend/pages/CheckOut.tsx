@@ -15,6 +15,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import type { NewOrderRequest } from "../types/types";
+import DemoPaymentToaster from "../components/utils/DemoPaymentToaster";
 
 // Load Stripe outside component to avoid recreating it on every render
 const stripePromise = loadStripe(
@@ -41,6 +42,10 @@ const CheckoutForm = () => {
   const [paymentError, setPaymentError] = useState<string | null>(null);
 
   const [newOrder] = useNewOrderMutation();
+
+  useEffect(() => {
+    scrollTo(0, 0);
+  }, []);
   useEffect(() => {
     if (!cartItems || cartItems.length === 0) {
       if (!hasPaid) {
@@ -230,6 +235,7 @@ const CheckoutForm = () => {
           </span>
         </div>
       </div>
+      <DemoPaymentToaster />
     </div>
   );
 };
