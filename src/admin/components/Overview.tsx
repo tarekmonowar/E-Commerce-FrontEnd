@@ -1,3 +1,5 @@
+import { useTheme } from "@/contexts/use-theme";
+import { useGetLast12MonthsStatsQuery } from "@/redux/api/statsApi";
 import {
   Area,
   AreaChart,
@@ -6,35 +8,16 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { overviewData } from "../components/constants";
-import { useTheme } from "@/contexts/use-theme";
 import TableOverview from "./TableOverview";
 
 export default function Overview() {
   const { theme } = useTheme();
+  const { data, error } = useGetLast12MonthsStatsQuery();
 
-  //  const [overviewData, setOverviewData] = useState<
-  //   { name: string; revenue: number; orders: number }[]
-  // >([]);
-  // Simulate fetching backend stats
-  // useEffect(() => {
-  //   const stats = {
-  //     chart: {
-  //       orders: [0, 0, 0, 0, 0, 9],
-  //       revenue: [0, 0, 0, 0, 0, 530648],
-  //     },
-  //   };
-
-  //   const { last6Months } = getLastMonths();
-
-  //   const formatted = last6Months.map((month, index) => ({
-  //     name: month,
-  //     revenue: stats.chart.revenue[index],
-  //     orders: stats.chart.orders[index],
-  //   }));
-
-  //   setOverviewData(formatted);
-  // }, []);
+  const overviewData = data?.data ?? [];
+  if (error) {
+    console.log("error fetching last 12 months stats", error);
+  }
 
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-7">
@@ -68,9 +51,10 @@ export default function Overview() {
               {/* Primary Y-axis for revenue */}
               <YAxis
                 yAxisId="left"
-                stroke="#2563eb"
+                stroke={theme === "light" ? "#2563eb" : "#2563eb"}
                 tickFormatter={(value) => `$${value}`}
-                tickMargin={6}
+                tickSize={4}
+                tickMargin={4}
               />
 
               {/* Secondary Y-axis for orders */}

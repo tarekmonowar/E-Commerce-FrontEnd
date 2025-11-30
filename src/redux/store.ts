@@ -12,6 +12,7 @@ import { couponApi } from "./api/couponApi";
 import { wishlistReducer } from "./reducer/wishlistReducer";
 import { wishlistApi } from "./api/wishlistApi";
 import { supportApi } from "./api/supportApi";
+import { statsApi } from "./api/statsApi";
 
 export const server = import.meta.env.VITE_SERVER;
 
@@ -67,6 +68,7 @@ const store = configureStore({
     [couponApi.reducerPath]: couponApi.reducer,
     [wishlistApi.reducerPath]: wishlistApi.reducer,
     [supportApi.reducerPath]: supportApi.reducer,
+    [statsApi.reducerPath]: statsApi.reducer,
     [userReducer.name]: userReducer.reducer,
     [cartReducer.name]: cartReducer.reducer,
     [wishlistReducer.name]: wishlistReducer.reducer,
@@ -81,6 +83,7 @@ const store = configureStore({
       couponApi.middleware,
       wishlistApi.middleware,
       supportApi.middleware,
+      statsApi.middleware,
       LocalStorageMiddleware,
     ]),
 });
