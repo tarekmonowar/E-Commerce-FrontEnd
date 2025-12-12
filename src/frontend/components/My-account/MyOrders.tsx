@@ -19,7 +19,7 @@ import { useMyOrdersQuery } from "@/redux/api/orderApi";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
-// 🖨️ Print Function
+// 🖨️ Print order details Function
 const handlePrint = (order: Order) => {
   const printWindow = document.createElement("iframe");
   printWindow.style.position = "fixed";
