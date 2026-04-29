@@ -1,5 +1,7 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { MessageCircle, X, Send } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -9,6 +11,7 @@ interface Message {
   content: string;
   sender: "user" | "ai";
   timestamp: Date;
+  streaming?: boolean;
 }
 
 const DEFAULT_QUESTIONS = [
@@ -17,6 +20,21 @@ const DEFAULT_QUESTIONS = [
   "What technologies are used ?",
 ];
 
+/**
+ * Pick how many characters to reveal per animation frame based on how far
+ * the displayed text is behind the buffered text. This is what makes the
+ * stream feel smooth like ChatGPT/Gemini even when the network sends
+ * tokens in big bursts.
+ */
+const charsPerFrame = (backlog: number) => {
+  if (backlog <= 0) return 0;
+  if (backlog < 40) return 1; // tiny backlog -> classic typewriter feel
+  if (backlog < 120) return 2;
+  if (backlog < 240) return 4;
+  if (backlog < 500) return 7;
+  return 12; // huge backlog -> catch up fast so user doesn't wait
+};
+
 export function AIChatMessenger() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -24,35 +42,106 @@ export function AIChatMessenger() {
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = () => {
+  // Smooth-stream refs (one active stream at a time is enough for this widget)
+  const bufferRef = useRef<string>(""); // full text received from network so far
+  const displayedLenRef = useRef<number>(0); // chars currently shown in UI
+  const streamDoneRef = useRef<boolean>(false); // network finished?
+  const rafRef = useRef<number | null>(null);
+  const activeAiIdRef = useRef<string | null>(null);
+
+  const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+  }, []);
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, scrollToBottom]);
+
+  useEffect(() => {
+    return () => {
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+    };
+  }, []);
+
+  /** Animation loop: gradually reveal characters from buffer to UI. */
+  const tick = useCallback(() => {
+    const aiId = activeAiIdRef.current;
+    if (!aiId) {
+      rafRef.current = null;
+      return;
+    }
+
+    const backlog = bufferRef.current.length - displayedLenRef.current;
+    const step = charsPerFrame(backlog);
+
+    if (step > 0) {
+      displayedLenRef.current = Math.min(
+        displayedLenRef.current + step,
+        bufferRef.current.length,
+      );
+
+      const visible = bufferRef.current.slice(0, displayedLenRef.current);
+
+      setMessages((prev) => {
+        const idx = prev.findIndex((m) => m.id === aiId);
+        if (idx === -1) return prev;
+        const updated = [...prev];
+        updated[idx] = { ...updated[idx], content: visible, streaming: true };
+        return updated;
+      });
+    }
+
+    const caughtUp =
+      displayedLenRef.current >= bufferRef.current.length &&
+      streamDoneRef.current;
+
+    if (caughtUp) {
+      // Finalize: drop the streaming flag so the cursor disappears
+      setMessages((prev) => {
+        const idx = prev.findIndex((m) => m.id === aiId);
+        if (idx === -1) return prev;
+        const updated = [...prev];
+        updated[idx] = { ...updated[idx], streaming: false };
+        return updated;
+      });
+      activeAiIdRef.current = null;
+      rafRef.current = null;
+      return;
+    }
+
+    rafRef.current = requestAnimationFrame(tick);
+  }, []);
+
+  const startTickIfIdle = useCallback(() => {
+    if (rafRef.current === null) {
+      rafRef.current = requestAnimationFrame(tick);
+    }
+  }, [tick]);
 
   const sendToAI = async (userMessage: string) => {
+    // Reset stream state for this turn
+    bufferRef.current = "";
+    displayedLenRef.current = 0;
+    streamDoneRef.current = false;
+
     try {
       setIsTyping(true);
 
       const res = await fetch(`${import.meta.env.VITE_SERVER}/api/v1/ai/chat`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: userMessage }),
       });
 
+      if (!res.ok) throw new Error("AI connect error");
       if (!res.body) throw new Error("No stream");
-      if (!res.ok) {
-        throw new Error("AI connect error");
-      }
+
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       const aiId = Date.now().toString();
+      activeAiIdRef.current = aiId;
 
-      // create empty AI message first
+      // Insert empty AI bubble — content will be filled by the tick loop
       setMessages((prev) => [
         ...prev,
         {
@@ -60,44 +149,39 @@ export function AIChatMessenger() {
           content: "",
           sender: "ai",
           timestamp: new Date(),
+          streaming: true,
         },
       ]);
 
-      let fullText = "";
+      // Hide the "thinking" indicator as soon as we know the request is live;
+      // the bubble itself shows the streaming cursor from here on.
+      setIsTyping(false);
+
+      // Kick off the reveal animation
+      startTickIfIdle();
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-
-        const chunk = decoder.decode(value, { stream: true });
-        fullText += chunk;
-
-        // live update UI
-        setMessages((prev) => {
-          const updated = [...prev];
-          const index = updated.findIndex((m) => m.id === aiId);
-
-          if (index !== -1) {
-            updated[index] = {
-              ...updated[index],
-              content: fullText,
-            };
-          }
-
-          scrollToBottom();
-
-          return updated;
-        });
+        bufferRef.current += decoder.decode(value, { stream: true });
+        startTickIfIdle();
       }
+
+      streamDoneRef.current = true;
+      startTickIfIdle();
     } catch (err) {
-      const aiMessage: Message = {
-        id: Date.now().toString(),
-        content: "Error: AI service is unavailable.",
-        sender: "ai",
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, aiMessage]);
       console.log(err);
+      streamDoneRef.current = true;
+      activeAiIdRef.current = null;
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now().toString(),
+          content: "Error: AI service is unavailable.",
+          sender: "ai",
+          timestamp: new Date(),
+        },
+      ]);
     } finally {
       setIsTyping(false);
     }
@@ -130,34 +214,9 @@ export function AIChatMessenger() {
 
   return (
     <>
-      {/* Chat Button */}
-      {/* <div className="fixed bottom-6 right-6 z-50">
-        {!isOpen && (
-          <div className="relative animate-fade-in">
-            
-            <Button
-              onClick={() => setIsOpen(true)}
-              className="relative h-16 w-16 rounded-full bg-gradient-to-br from-[#2C742F] to-[#1fbd61] hover:from-[#1fbd61] hover:to-[#2C742F]
-        shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 cursor-pointer"
-            >
-              <MessageCircle
-                className="!h-6 !w-6 text-white"
-                strokeWidth={2.5}
-              />
-            </Button>
-          </div>
-        )}
-      </div> */}
-
       <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2">
         {!isOpen && (
           <div className="relative animate-fade-in flex flex-col items-end">
-            {/* Tooltip / label */}
-            {/* <div className="mb-2 px-3 py-1 rounded-full bg-green-600 text-white text-xs font-medium shadow-lg animate-bounce">
-              TM AI Messenger
-            </div> */}
-
-            {/* Chat Icon Button */}
             <Button
               onClick={() => setIsOpen(true)}
               className="relative h-16 w-16 rounded-full bg-gradient-to-br from-[#2C742F] to-[#1fbd61] hover:from-[#1fbd61] hover:to-[#2C742F]
@@ -169,7 +228,6 @@ export function AIChatMessenger() {
               />
             </Button>
 
-            {/* Small notification dot */}
             <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-ping"></div>
           </div>
         )}
@@ -236,17 +294,116 @@ export function AIChatMessenger() {
               >
                 <div
                   className={cn(
-                    "rounded-2xl p-4 max-w-[80%] shadow-sm",
+                    "rounded-2xl p-4 max-w-[85%] shadow-sm",
                     message.sender === "user"
                       ? "bg-[#2C742F] text-white rounded-sm"
                       : "bg-gray-300 text-black rounded-sm wrap-break-word",
                   )}
                 >
-                  <p className="text-sm">{message.content}</p>
-                  <div className="flex justify-between">
+                  {message.sender === "user" ? (
+                    <p className="text-sm whitespace-pre-wrap">
+                      {message.content}
+                    </p>
+                  ) : (
+                    <div className="text-sm leading-relaxed ai-markdown">
+                      <ReactMarkdown
+                        remarkPlugins={[remarkGfm]}
+                        components={{
+                          p: ({ children }) => (
+                            <p className="mb-2 last:mb-0 whitespace-pre-wrap">
+                              {children}
+                            </p>
+                          ),
+                          ul: ({ children }) => (
+                            <ul className="list-disc pl-5 mb-2 space-y-1">
+                              {children}
+                            </ul>
+                          ),
+                          ol: ({ children }) => (
+                            <ol className="list-decimal pl-5 mb-2 space-y-1">
+                              {children}
+                            </ol>
+                          ),
+                          li: ({ children }) => (
+                            <li className="leading-snug">{children}</li>
+                          ),
+                          strong: ({ children }) => (
+                            <strong className="font-semibold text-black">
+                              {children}
+                            </strong>
+                          ),
+                          em: ({ children }) => (
+                            <em className="italic">{children}</em>
+                          ),
+                          h1: ({ children }) => (
+                            <h3 className="text-base font-semibold mb-1 mt-2">
+                              {children}
+                            </h3>
+                          ),
+                          h2: ({ children }) => (
+                            <h3 className="text-base font-semibold mb-1 mt-2">
+                              {children}
+                            </h3>
+                          ),
+                          h3: ({ children }) => (
+                            <h3 className="text-sm font-semibold mb-1 mt-2">
+                              {children}
+                            </h3>
+                          ),
+                          h4: ({ children }) => (
+                            <h4 className="text-sm font-semibold mb-1 mt-2">
+                              {children}
+                            </h4>
+                          ),
+                          code: ({ children, className }) => {
+                            const text = String(children ?? "");
+                            const isBlock =
+                              text.includes("\n") ||
+                              /language-/.test(className ?? "");
+                            return isBlock ? (
+                              <code className="font-mono text-[12px] block">
+                                {children}
+                              </code>
+                            ) : (
+                              <code className="bg-white/70 text-[#2C742F] px-1 py-0.5 rounded text-[12px] font-mono">
+                                {children}
+                              </code>
+                            );
+                          },
+                          pre: ({ children }) => (
+                            <pre className="bg-white/70 rounded-md p-2 my-2 overflow-x-auto text-[12px] leading-snug">
+                              {children}
+                            </pre>
+                          ),
+                          a: ({ children, href }) => (
+                            <a
+                              href={href}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-[#2C742F] underline break-all"
+                            >
+                              {children}
+                            </a>
+                          ),
+                          blockquote: ({ children }) => (
+                            <blockquote className="border-l-2 border-[#2C742F] pl-2 italic text-gray-700 my-2">
+                              {children}
+                            </blockquote>
+                          ),
+                          hr: () => <hr className="my-2 border-gray-400/60" />,
+                        }}
+                      >
+                        {message.content}
+                      </ReactMarkdown>
+                      {message.streaming && (
+                        <span className="inline-block w-[7px] h-[14px] align-[-2px] bg-[#2C742F] ml-0.5 animate-pulse rounded-[1px]" />
+                      )}
+                    </div>
+                  )}
+                  <div className="flex justify-between mt-1">
                     <p
                       className={cn(
-                        "text-xs mt-1",
+                        "text-xs",
                         message.sender === "user"
                           ? "text-white/70"
                           : "text-gray-500",
@@ -258,10 +415,7 @@ export function AIChatMessenger() {
                       })}
                     </p>
                     {message.sender === "ai" && (
-                      <span className="text-xs mt-1 text-[#2C742F]">
-                        {" "}
-                        From TM AI
-                      </span>
+                      <span className="text-xs text-[#2C742F]">From TM AI</span>
                     )}
                   </div>
                 </div>
@@ -271,10 +425,8 @@ export function AIChatMessenger() {
             {isTyping && (
               <div className="flex justify-start animate-fade-in">
                 <div className="bg-chat-ai-bg rounded-2xl rounded-tl-sm p-3 max-w-[85%] flex items-center gap-3">
-                  {/* Spinning icon */}
                   <div className="w-5 h-5 border-2 border-b-fuchsia-700 border-e-teal-600 border-l-indigo-500 border-t-red-700 rounded-full animate-spin"></div>
 
-                  {/* Text */}
                   <span className="text-sm font-medium text-muted-foreground">
                     TM AI Thinking...
                   </span>
