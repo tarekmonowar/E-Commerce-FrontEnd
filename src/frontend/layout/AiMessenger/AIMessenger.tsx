@@ -45,6 +45,9 @@ export function AIChatMessenger() {
       });
 
       if (!res.body) throw new Error("No stream");
+      if (!res.ok) {
+        throw new Error("AI connect error");
+      }
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       const aiId = Date.now().toString();
