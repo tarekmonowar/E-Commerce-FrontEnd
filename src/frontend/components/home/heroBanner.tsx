@@ -30,7 +30,7 @@ const banners = [
   },
   {
     id: 2,
-    title: "Tarek Monowar Store",
+    title: "Tarek Monowar -Store",
     subtitle: "Fashion & Electronics",
     description:
       "Explore our vast collection of fashion, electronics, and lifestyle products. Everything you need in one place.",
@@ -45,7 +45,7 @@ const banners = [
   },
   {
     id: 3,
-    title: "Tarek Monowar Shop",
+    title: "Tarek Monowar -Shop",
     subtitle: "Special Offers Daily",
     description:
       "Don't miss out on our daily special offers. Save big on your favorite brands and discover new products every day.",
@@ -60,7 +60,7 @@ const banners = [
   },
   {
     id: 4,
-    title: "Tarek Monowar Market",
+    title: "Tarek Monowar -Market",
     subtitle: "Your Shopping Destination",
     description:
       "Experience seamless online shopping with our user-friendly platform. Quality products, competitive prices.",
@@ -103,7 +103,7 @@ const HeroBanner = () => {
   }, [instanceRef]);
 
   return (
-    <div className="relative w-full h-[300px] sm:h-[400px] md:h-[450px] lg:h-[500px]  rounded-lg shadow-2xl ">
+    <div className="relative w-full h-[300px] sm:h-[300px] md:h-[350px] lg:h-[380px] xl:h-[400px]  rounded-lg shadow-2xl ">
       {/* Right Side Banner */}
       <div className="absolute hidden [@media(min-width:1880px)]:flex right-[calc((100%-1280px)/2-12%)] sm:right-[calc((100%-1280px)/2-18%)] md:right-[calc((100%-1280px)/2-20%)] top-0 w-[20%] h-full z-20 items-center justify-center mr-4 ">
         <div
@@ -167,7 +167,7 @@ const HeroBanner = () => {
       {/* Main Banner div */}
       <div
         ref={sliderRef}
-        className="keen-slider h-full rounded-lg w-[70%] sm:w-[64%] md:w-[60%] shadow-[0_2px_4px_rgba(0,0,0,0.4),_0_7px_13px_-3px_rgba(0,0,0,0.3),_inset_0_-3px_0px_rgba(0,0,0,0.2)]"
+        className="keen-slider h-full rounded-lg w-[40%] sm:w-[38%] md:w-[40%] shadow-[0_2px_4px_rgba(0,0,0,0.4),_0_7px_13px_-3px_rgba(0,0,0,0.3),_inset_0_-3px_0px_rgba(0,0,0,0.2)] "
       >
         {banners.map((banner) => (
           <div
@@ -177,13 +177,13 @@ const HeroBanner = () => {
             {/* Left side: Text & buttons */}
             <div className="flex-1 text-white z-10">
               <div className="max-w-xl lg:max-w-2xl">
-                <span className="inline-block px-3 py-1.5 sm:px-4 sm:py-2 bg-white/20 backdrop-blur-sm rounded-full text-xs sm:text-sm font-medium mb-3 sm:mb-4">
+                <span className="inline-block px-2 py-1.5 sm:px-3 sm:py-1 bg-white/20 backdrop-blur-sm rounded-full text-xs font-medium mb-3 sm:mb-4">
                   {banner.subtitle}
                 </span>
-                <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-4 sm:mb-6 leading-tight">
+                <h1 className="text-xl sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold mb-3 sm:mb-5 leading-tight">
                   {banner.title}
                 </h1>
-                <p className="text-sm sm:text-base md:text-lg lg:text-xl mb-6 sm:mb-8 opacity-90 line-clamp-2 sm:line-clamp-none">
+                <p className="text-sm sm:text-base  lg:text-md mb-6 sm:mb-8 opacity-90 line-clamp-2 sm:line-clamp-none">
                   {banner.description}
                 </p>
                 {/* Features */}
@@ -191,7 +191,7 @@ const HeroBanner = () => {
                   {banner.features.map((feature, index) => (
                     <div
                       key={index}
-                      className="flex items-center space-x-1.5 bg-white/20 backdrop-blur-sm rounded-full px-2.5 py-1.5 sm:px-4 sm:py-2"
+                      className="flex items-center space-x-1.5 bg-white/20 backdrop-blur-sm rounded-full px-2.5 py-1 sm:px-3 sm:py-1.5"
                     >
                       {index === 0 && (
                         <Truck className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -202,23 +202,21 @@ const HeroBanner = () => {
                       {index === 2 && (
                         <ShoppingBag className="w-3 h-3 sm:w-4 sm:h-4" />
                       )}
-                      <span className="text-xs sm:text-sm font-medium">
-                        {feature}
-                      </span>
+                      <span className="text-xs sm:text-sm ">{feature}</span>
                     </div>
                   ))}
                 </div>
                 {/* Buttons */}
                 <div className="flex flex-row space-y-2 sm:space-y-0 gap-2 sm:gap-0 sm:space-x-4 pb-2">
                   <Link to="/all-products">
-                    <Button className="bg-white text-gray-900 hover:bg-gray-100 px-6 py-2.5 sm:px-8 sm:py-3 text-sm sm:text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer">
+                    <Button className="bg-white text-gray-900 hover:bg-gray-100 px-6 py-2.5 sm:px-8 sm:py-3 text-sm sm:text-md font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer">
                       Shop Now
                     </Button>
                   </Link>
                   <Link to="/all-products">
                     <Button
                       variant="outline"
-                      className="border-white text-white hover:bg-white cursor-pointer px-6 py-2.5 sm:px-8 sm:py-3 text-sm sm:text-lg font-semibold backdrop-blur-sm transition-all duration-300 hover:scale-105"
+                      className="border-white text-white hover:bg-white cursor-pointer px-6 py-2.5 sm:px-8 sm:py-3 text-sm sm:text-md font-semibold backdrop-blur-sm transition-all duration-300 hover:scale-105"
                     >
                       View Products
                     </Button>
@@ -229,11 +227,11 @@ const HeroBanner = () => {
 
             {/* Right side: Image */}
             <div className="hidden md:flex flex-1 justify-end items-center">
-              <div className="relative w-80 h-80 xl:w-96 xl:h-96">
+              <div className="relative w-72 h-72 xl:w-80 xl:h-80 bg-gray-500 rounded-2xl">
                 <img
                   src={banner.image}
                   alt={banner.title}
-                  className="relative w-full h-full object-cover rounded-2xl shadow-2xl transform -rotate-3 hover:rotate-0 transition-transform duration-500"
+                  className="relative w-full h-full object-cover rounded-2xl shadow-2xl transform -rotate-3 hover:rotate-0 transition-transform duration-500 border-2 border-white"
                 />
               </div>
             </div>
@@ -245,9 +243,11 @@ const HeroBanner = () => {
                 return (
                   <div
                     key={index}
-                    className="flex items-center space-x-1.5 bg-white [box-shadow:0px_2px_8px_0px_rgba(99,99,99,0.2)] text-gray-700 backdrop-blur-sm px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-md text-xs xl:text-sm font-medium shadow-lg"
+                    className="flex items-center space-x-1.5 bg-white  text-gray-700 backdrop-blur-sm px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-md text-xs  shadow-lg"
                   >
-                    <Icon className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <Icon
+                      className={`w-3 h-3 sm:w-4 sm:h-4 ${index === 1 ? "text-blue-500 fill-cyan-600" : "text-fuchsia-500 fill-fuchsia-800"}`}
+                    />
                     <span>{badge.text}</span>
                   </div>
                 );

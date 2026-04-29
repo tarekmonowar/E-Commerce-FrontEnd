@@ -45,7 +45,7 @@ const categories = [
 
 const CategorySection = () => {
   return (
-    <div className="w-full bg-white mt-10 xl:mt-15 py-4 pl-3 rounded-md">
+    <div className="w-full bg-white mt-7 xl:mt-10 py-4 pl-3 rounded-md">
       <div className="container mx-auto">
         <div className="grid grid-cols-4 md:grid-cols-8 gap-2">
           {categories.map((category) => {

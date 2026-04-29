@@ -334,14 +334,14 @@ export function AIChatMessenger() {
           {/* Floating chat button with layered animations */}
           <div className="relative tm-ai-float">
             {/* Rotating conic-gradient halo behind the button */}
-            <span
+            {/* <span
               aria-hidden
               className="tm-ai-spin-slow absolute -inset-[3px] rounded-full opacity-70 blur-[1px]"
               style={{
                 background:
                   "conic-gradient(from 0deg, #2C742F, #1fbd61, #a7f3d0, #2C742F)",
               }}
-            />
+            /> */}
 
             {/* Two staggered pulse rings */}
             <span
@@ -357,7 +357,7 @@ export function AIChatMessenger() {
             <Button
               onClick={openChat}
               aria-label="Open AI chat"
-              className="relative h-14 w-14 sm:h-16 sm:w-16 rounded-full bg-gradient-to-br from-[#2C742F] to-[#1fbd61] hover:from-[#1fbd61] hover:to-[#2C742F] shadow-xl hover:shadow-2xl transition-transform duration-300 hover:scale-110 hover:-rotate-6 cursor-pointer"
+              className="relative h-12 w-12 sm:h-14 sm:w-14 xl:h-16 xl:w-16 rounded-full bg-gradient-to-br from-[#2C742F] to-[#1fbd61] hover:from-[#1fbd61] hover:to-[#2C742F]  hover:shadow-2xl transition-transform duration-300 hover:scale-110 hover:-rotate-6 cursor-pointer"
             >
               <MessageCircle
                 className="!h-5 !w-5 sm:!h-6 sm:!w-6 text-white"
@@ -387,7 +387,7 @@ export function AIChatMessenger() {
             sm:w-[380px] sm:h-[600px] sm:max-h-[85vh]"
         >
           {/* Header */}
-          <div className="bg-gradient-to-br from-[#2C742F] to-[#1fbd61] p-3 sm:p-4 flex items-center justify-between">
+          <div className="bg-gradient-to-br from-emerald-800 via-green-900 to-slate-900 p-3 sm:p-4 flex items-center justify-between">
             <div className="flex items-center gap-2 sm:gap-3 min-w-0">
               <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-full bg-white/20 flex items-center justify-center shrink-0">
                 <MessageCircle className="h-5 w-5 text-white" />
@@ -448,7 +448,7 @@ export function AIChatMessenger() {
                   className={cn(
                     "rounded-2xl p-4 max-w-[85%] shadow-sm",
                     message.sender === "user"
-                      ? "bg-[#2C742F] text-white rounded-sm"
+                      ? "bg-slate-700 text-white rounded-sm"
                       : "bg-gray-300 text-black rounded-sm wrap-break-word",
                   )}
                 >
