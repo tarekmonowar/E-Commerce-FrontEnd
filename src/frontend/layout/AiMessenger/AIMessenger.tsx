@@ -44,17 +44,48 @@ export function AIChatMessenger() {
         body: JSON.stringify({ message: userMessage }),
       });
 
-      const data = await res.json();
-      console.log(data);
+      if (!res.body) throw new Error("No stream");
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      const aiId = Date.now().toString();
 
-      const aiMessage: Message = {
-        id: Date.now().toString(),
-        content: data?.data || "No response from AI",
-        sender: "ai",
-        timestamp: new Date(),
-      };
+      // create empty AI message first
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: aiId,
+          content: "",
+          sender: "ai",
+          timestamp: new Date(),
+        },
+      ]);
 
-      setMessages((prev) => [...prev, aiMessage]);
+      let fullText = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+        fullText += chunk;
+
+        // live update UI
+        setMessages((prev) => {
+          const updated = [...prev];
+          const index = updated.findIndex((m) => m.id === aiId);
+
+          if (index !== -1) {
+            updated[index] = {
+              ...updated[index],
+              content: fullText,
+            };
+          }
+
+          scrollToBottom();
+
+          return updated;
+        });
+      }
     } catch (err) {
       const aiMessage: Message = {
         id: Date.now().toString(),
