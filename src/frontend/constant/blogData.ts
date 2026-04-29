@@ -12,44 +12,46 @@ export interface BlogPost {
 export const blogPosts: BlogPost[] = [
   {
     id: "1",
-    title:
-      "How Prefabricated Homes Are Shaping the Future of Sustainable Living",
+    title: "How Technology Is Changing Opportunities in the Digital Economy",
     excerpt:
-      "Discover how modern prefabricated homes are redefining eco-friendly living with innovation, efficiency, and affordability.",
-    content: `The global shift toward sustainability has paved the way for innovative housing solutions, with prefabricated homes emerging as a top contender. These homes are not only cost-effective but also environmentally conscious, significantly reducing waste and carbon footprints.
+      "Explore how artificial intelligence is creating new income opportunities, automating businesses, and transforming the way people earn online.",
+    content: `Artificial Intelligence is reshaping the global economy and changing how individuals and businesses generate income in 2026. From freelancers to entrepreneurs, AI tools are unlocking faster, smarter, and more scalable ways to earn money.
 
-Modern prefab homes are designed with energy efficiency in mind. From solar panel integrations to superior insulation, these structures minimize energy usage while offering maximum comfort. Additionally, the controlled factory environment allows for precise material usage and faster construction timelines.
+One of the biggest shifts is in freelancing and digital services. AI-powered tools can now help creators write content, design graphics, edit videos, and even build websites in a fraction of the time. This means freelancers can deliver more work, serve more clients, and increase their earnings.
 
-Sustainability isn't just about the materials used — it’s also about how these homes interact with their environment. Many designs now incorporate passive house principles, which rely on sunlight, ventilation, and smart orientation to maintain indoor temperature with minimal energy input.
+For entrepreneurs, AI is automating business operations such as customer support, marketing, and sales. AI chatbots can handle customer inquiries 24/7, while AI marketing tools can create ad campaigns, analyze performance, and optimize results automatically.
 
-For eco-conscious homeowners and developers alike, prefabricated homes represent a smart, forward-thinking investment in both quality and the planet’s future.`,
-    image: "https://serviceapi.spicezgold.com/download/1741758993155_6-4.jpg",
-    date: "2025-07-10",
+Content creators are also benefiting from AI. YouTubers, bloggers, and social media influencers use AI for scriptwriting, thumbnail design, SEO optimization, and audience analysis to grow faster and monetize their content more effectively.
+
+Additionally, AI is opening doors to entirely new income streams, such as building AI SaaS products, selling AI-generated digital products, or offering AI automation services to businesses.
+
+As AI continues to evolve, those who learn to use it effectively will gain a significant advantage in creating multiple streams of income in the digital economy.`,
+    image: "/blogs/2.avif",
+    date: "2026-04-10",
     author: "Tarek Monowar",
     category: "Sustainable Living",
     readTime: "5 min read",
   },
   {
     id: "2",
-    title: "5 E-Commerce Trends That Will Dominate in 2025",
+    title: "5 E-Commerce Use Cases Of Agentic Ai in 2026",
     excerpt:
-      "Explore the biggest trends in e-commerce that are reshaping the way businesses and consumers connect and interact.",
-    content: `As online shopping continues to grow, e-commerce businesses must stay ahead by adopting emerging trends. In 2025, several key developments are expected to redefine the digital marketplace.
+      "Discover how Agentic AI is transforming e-commerce operations, customer experiences, and business growth in 2026.",
+    content: `Agentic AI is revolutionizing the e-commerce industry in 2026 by enabling autonomous systems that can make decisions, take actions, and continuously optimize business processes without human intervention.
 
-1. **Hyper-Personalization** – AI-powered recommendations, predictive shopping, and tailored marketing will create one-to-one customer experiences.
+1. **AI Shopping Assistants** – Intelligent AI agents can guide customers through product discovery, answer questions instantly, and recommend products based on behavior and preferences.
 
-2. **Voice and Visual Search** – With smart devices becoming common, customers are turning to voice assistants and camera-based searches for quicker navigation.
+2. **Autonomous Customer Support** – Agentic AI can handle customer queries, process refunds, track orders, and resolve complaints 24/7 with minimal human involvement.
 
-3. **Sustainable Commerce** – Eco-conscious packaging, carbon-neutral shipping, and ethical sourcing are now top priorities for shoppers.
+3. **Dynamic Pricing Optimization** – AI agents analyze market trends, competitor prices, and customer demand in real time to automatically adjust pricing for maximum profit.
 
-4. **Live Shopping & Shoppable Videos** – Real-time product demos on platforms like Instagram and TikTok are driving instant engagement and conversions.
+4. **Inventory & Supply Chain Automation** – AI systems can predict demand, manage stock levels, reorder products, and optimize logistics to reduce delays and costs.
 
-5. **Omnichannel Fulfillment** – Blending online and offline experiences with options like click-and-collect, curbside pickup, and ultra-fast delivery is now essential.
+5. **Personalized Marketing Campaigns** – Agentic AI can create, test, and optimize email campaigns, ads, and promotions tailored to individual customer journeys.
 
-For any e-commerce brand aiming to thrive, adapting to these trends is not optional — it's critical.`,
-    image:
-      "https://serviceapi.spicezgold.com/download/1750304462017_1000005912.jpg",
-    date: "2025-07-12",
+Businesses that adopt Agentic AI early will gain a competitive edge through automation, efficiency, and highly personalized shopping experiences.`,
+    image: "/blogs/3.webp",
+    date: "2026-02-12",
     author: "Tarek Monowar",
     category: "E-commerce Trends",
     readTime: "4 min read",
@@ -94,7 +96,7 @@ From intuitive website design to seamless checkout processes, CX is the foundati
 In 2025 and beyond, experience is everything. Make it remarkable — and customers will keep coming back.`,
     image:
       "https://plus.unsplash.com/premium_photo-1681830630610-9f26c9729b75?q=80&w=1170&auto=format&fit=crop",
-    date: "2025-07-18",
+    date: "2024-07-18",
     author: "Tarek Monowar",
     category: "Customer Experience",
     readTime: "7 min read",
