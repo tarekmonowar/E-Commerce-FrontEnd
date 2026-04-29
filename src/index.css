@@ -212,3 +212,129 @@
 .animate-marquee {
   animation: marquee 12s linear infinite;
 }
+
+/* === TM AI Messenger floating-button animations === */
+
+/* Soft up-down float (replaces jumpy bounce) */
+@keyframes tm-ai-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+.tm-ai-float {
+  animation: tm-ai-float 3s ease-in-out infinite;
+}
+
+/* Expanding pulse rings around the button */
+@keyframes tm-ai-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  80% {
+    opacity: 0.05;
+  }
+  100% {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+}
+.tm-ai-ring {
+  animation: tm-ai-ring 2.4s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+/* Slow conic-gradient halo rotation */
+@keyframes tm-ai-spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.tm-ai-spin-slow {
+  animation: tm-ai-spin-slow 6s linear infinite;
+}
+
+/* Welcome bubble slide-in (overshoot for a bouncy pop) */
+@keyframes tm-ai-bubble-in {
+  0% {
+    opacity: 0;
+    transform: translateX(24px) scale(0.85);
+  }
+  60% {
+    opacity: 1;
+    transform: translateX(-4px) scale(1.03);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+.tm-ai-bubble-in {
+  animation: tm-ai-bubble-in 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* Shimmering text for the welcome label */
+@keyframes tm-ai-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+.tm-ai-shimmer {
+  background: linear-gradient(
+    90deg,
+    #1f2937 0%,
+    #1f2937 35%,
+    #2c742f 50%,
+    #1f2937 65%,
+    #1f2937 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: tm-ai-shimmer 3.2s linear infinite;
+}
+
+/* Tiny attention sparkle (rotating + scaling) */
+@keyframes tm-ai-sparkle {
+  0%,
+  100% {
+    transform: rotate(0deg) scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: rotate(180deg) scale(1.25);
+    opacity: 1;
+  }
+}
+.tm-ai-sparkle {
+  animation: tm-ai-sparkle 2.6s ease-in-out infinite;
+}
+
+/* Pop-in for rotating text phrases (fades up from below) */
+@keyframes tm-ai-text-pop {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+    filter: blur(2px);
+  }
+  60% {
+    opacity: 1;
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+.tm-ai-text-pop {
+  animation: tm-ai-text-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}

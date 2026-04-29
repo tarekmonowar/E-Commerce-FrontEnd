@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { MessageCircle, X, Send } from "lucide-react";
+import { MessageCircle, X, Send, Sparkles } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Button } from "@/components/ui/button";
@@ -35,12 +35,59 @@ const charsPerFrame = (backlog: number) => {
   return 12; // huge backlog -> catch up fast so user doesn't wait
 };
 
+const WELCOME_STORAGE_KEY = "tm-ai-welcome-seen";
+
+const PILL_PHRASES = ["Need help?", "Ask AI", "Chat now"];
+const PILL_INTERVAL_MS = 2400;
+
 export function AIChatMessenger() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(false);
+  const [pillIdx, setPillIdx] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Cycle the rotating "Need help? / Ask AI / Chat now" pill while chat is closed
+  useEffect(() => {
+    if (isOpen) return;
+    const timer = window.setInterval(() => {
+      setPillIdx((i) => (i + 1) % PILL_PHRASES.length);
+    }, PILL_INTERVAL_MS);
+    return () => window.clearInterval(timer);
+  }, [isOpen]);
+
+  // Show the "Need help?" bubble once on a user's first visit
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const seen = window.localStorage.getItem(WELCOME_STORAGE_KEY);
+    if (seen) return;
+    const showTimer = window.setTimeout(() => setShowWelcome(true), 1500);
+    return () => window.clearTimeout(showTimer);
+  }, []);
+
+  // Auto-dismiss the welcome bubble after a while so it doesn't linger forever
+  useEffect(() => {
+    if (!showWelcome) return;
+    const hideTimer = window.setTimeout(() => {
+      setShowWelcome(false);
+      window.localStorage.setItem(WELCOME_STORAGE_KEY, "1");
+    }, 12000);
+    return () => window.clearTimeout(hideTimer);
+  }, [showWelcome]);
+
+  const dismissWelcome = useCallback(() => {
+    setShowWelcome(false);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(WELCOME_STORAGE_KEY, "1");
+    }
+  }, []);
+
+  const openChat = useCallback(() => {
+    setIsOpen(true);
+    dismissWelcome();
+  }, [dismissWelcome]);
 
   // Smooth-stream refs (one active stream at a time is enough for this widget)
   const bufferRef = useRef<string>(""); // full text received from network so far
@@ -214,37 +261,142 @@ export function AIChatMessenger() {
 
   return (
     <>
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2">
-        {!isOpen && (
-          <div className="relative animate-fade-in flex flex-col items-end">
+      {!isOpen && (
+        <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 flex items-end gap-2 sm:gap-3">
+          {/* First-visit welcome bubble (or rotating pill once dismissed) */}
+          {showWelcome ? (
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={openChat}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") openChat();
+              }}
+              className="tm-ai-bubble-in relative mb-3 max-w-[200px] sm:max-w-[230px] cursor-pointer rounded-2xl rounded-br-sm bg-white px-3 sm:px-4 py-2.5 sm:py-3 shadow-xl border border-green-100 hover:shadow-2xl transition-shadow"
+            >
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  dismissWelcome();
+                }}
+                aria-label="Dismiss"
+                className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-gray-300 text-white shadow hover:bg-gray-500 transition-colors"
+              >
+                <X className="h-3 w-3" strokeWidth={3} />
+              </button>
+
+              <div className="flex items-center gap-2">
+                <Sparkles
+                  className="h-4 w-4 text-[#2C742F] tm-ai-sparkle shrink-0"
+                  strokeWidth={2.5}
+                />
+                <p className="text-sm font-semibold tm-ai-shimmer">
+                  Need help?
+                </p>
+              </div>
+              <p className="mt-1 text-xs text-gray-700">
+                Ask the{" "}
+                <span className="font-semibold text-[#2C742F]">
+                  TM AI Assistant
+                </span>{" "}
+                — anything about this site.
+              </p>
+              <p className="mt-1 text-[10px] text-gray-400">
+                Click to start chatting →
+              </p>
+
+              {/* Tail pointing toward the chat icon */}
+              <span className="absolute -right-1.5 bottom-4 h-3 w-3 rotate-45 border-t border-r border-green-100 bg-white" />
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={openChat}
+              aria-label="Open AI chat"
+              className="tm-ai-bubble-in relative mb-3 flex items-center gap-1.5 rounded-full bg-white pl-2.5 pr-3 py-1.5 shadow-md border border-green-100 hover:shadow-lg hover:scale-[1.04] transition-all cursor-pointer"
+            >
+              <Sparkles
+                className="h-3.5 w-3.5 text-[#2C742F] tm-ai-sparkle shrink-0"
+                strokeWidth={2.8}
+              />
+              <span
+                key={pillIdx}
+                className="tm-ai-text-pop inline-block min-w-[68px] text-center text-[12px] font-bold text-[#2C742F] whitespace-nowrap"
+              >
+                {PILL_PHRASES[pillIdx]}
+              </span>
+              {/* Tail */}
+              <span className="absolute -right-1 bottom-3 h-2.5 w-2.5 rotate-45 border-t border-r border-green-100 bg-white" />
+            </button>
+          )}
+
+          {/* Floating chat button with layered animations */}
+          <div className="relative tm-ai-float">
+            {/* Rotating conic-gradient halo behind the button */}
+            <span
+              aria-hidden
+              className="tm-ai-spin-slow absolute -inset-[3px] rounded-full opacity-70 blur-[1px]"
+              style={{
+                background:
+                  "conic-gradient(from 0deg, #2C742F, #1fbd61, #a7f3d0, #2C742F)",
+              }}
+            />
+
+            {/* Two staggered pulse rings */}
+            <span
+              aria-hidden
+              className="tm-ai-ring absolute inset-0 rounded-full bg-[#2C742F]/40"
+            />
+            <span
+              aria-hidden
+              className="tm-ai-ring absolute inset-0 rounded-full bg-[#1fbd61]/40"
+              style={{ animationDelay: "1.2s" }}
+            />
+
             <Button
-              onClick={() => setIsOpen(true)}
-              className="relative h-16 w-16 rounded-full bg-gradient-to-br from-[#2C742F] to-[#1fbd61] hover:from-[#1fbd61] hover:to-[#2C742F]
-        shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 cursor-pointer animate-bounce"
+              onClick={openChat}
+              aria-label="Open AI chat"
+              className="relative h-14 w-14 sm:h-16 sm:w-16 rounded-full bg-gradient-to-br from-[#2C742F] to-[#1fbd61] hover:from-[#1fbd61] hover:to-[#2C742F] shadow-xl hover:shadow-2xl transition-transform duration-300 hover:scale-110 hover:-rotate-6 cursor-pointer"
             >
               <MessageCircle
-                className="!h-6 !w-6 text-white"
+                className="!h-5 !w-5 sm:!h-6 sm:!w-6 text-white"
                 strokeWidth={2.5}
               />
             </Button>
 
-            <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-ping"></div>
+            {/* Live online dot (ping + steady) */}
+            <span
+              aria-hidden
+              className="absolute top-1 right-1 h-2.5 w-2.5 rounded-full bg-red-500 animate-ping"
+            />
+            <span
+              aria-hidden
+              className="absolute top-1 right-1 h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white"
+            />
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-6 right-6 z-50 w-[380px] h-[600px] bg-slate-100 rounded-xl shadow-2xl chat-shadow animate-slide-up overflow-hidden flex flex-col">
+        <div
+          className="fixed z-50 bg-slate-100 chat-shadow animate-slide-up overflow-hidden flex flex-col rounded-xl shadow-2xl
+            top-3 right-3 bottom-3 left-3
+            sm:top-auto sm:left-auto sm:bottom-6 sm:right-6
+            sm:w-[380px] sm:h-[600px] sm:max-h-[85vh]"
+        >
           {/* Header */}
-          <div className="bg-gradient-to-br from-[#2C742F] to-[#1fbd61] p-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center">
+          <div className="bg-gradient-to-br from-[#2C742F] to-[#1fbd61] p-3 sm:p-4 flex items-center justify-between">
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+              <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-full bg-white/20 flex items-center justify-center shrink-0">
                 <MessageCircle className="h-5 w-5 text-white" />
               </div>
-              <div>
-                <h3 className="text-white font-semibold">AI Assistant</h3>
-                <p className="text-white/80 text-xs">
+              <div className="min-w-0">
+                <h3 className="text-white font-semibold text-sm sm:text-base">
+                  AI Assistant
+                </h3>
+                <p className="text-white/80 text-[11px] sm:text-xs truncate">
                   Online • Typically replies instantly
                 </p>
               </div>
@@ -253,14 +405,14 @@ export function AIChatMessenger() {
               variant="ghost"
               size="icon"
               onClick={() => setIsOpen(false)}
-              className="text-white rounded-full cursor-pointer bg-white/20  hover:bg-white/30"
+              className="text-white rounded-full cursor-pointer bg-white/20 hover:bg-white/30 shrink-0"
             >
               <X className="h-5 w-5" />
             </Button>
           </div>
 
           {/* Messages Area */}
-          <div className="flex-1 overflow-y-auto p-3 space-y-4 bg-slate-100">
+          <div className="flex-1 overflow-y-auto p-3 space-y-3 sm:space-y-4 bg-slate-100">
             {messages.length === 0 && (
               <div className="space-y-4">
                 <div className="bg-gray-300  rounded-sm p-4 max-w-[85%]">
@@ -438,13 +590,13 @@ export function AIChatMessenger() {
           </div>
 
           {/* Input Area */}
-          <div className="p-4 bg-white border-t border-gray-300">
+          <div className="p-3 sm:p-4 bg-white border-t border-gray-300">
             <form onSubmit={handleSubmit} className="flex gap-2">
               <Input
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder="Type your message..."
-                className="flex-1 rounded-full border-0 focus-visible:ring-[#2C742F] !text-black !bg-slate-200 focus-visible:ring-2 focus-visible:ring-offset-0"
+                className="flex-1 rounded-full border-0 focus-visible:ring-[#2C742F] !text-black !bg-slate-200 focus-visible:ring-2 focus-visible:ring-offset-0 text-sm"
                 disabled={isTyping}
               />
               <Button
